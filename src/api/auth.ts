@@ -1,32 +1,27 @@
 import { apiClient } from "./client";
 import type { ApiResponse, Admin } from "../types";
-import JSEncrypt from "jsencrypt";
+import CryptoJS from "crypto-js";
 
 interface LoginResponse {
   admin: Admin;
   token: string;
 }
 
-interface PublicKeyResponse {
-  publicKey: string;
+interface EncryptionKeyResponse {
+  encryptionKey: string;
 }
 
-// RSA 공개키 조회
-export const getPublicKey = () => apiClient.get("admin/auth/public-key").json<ApiResponse<PublicKeyResponse>>();
+// AES 암호화 키 조회
+export const getEncryptionKey = () => apiClient.get("admin/auth/encryption-key").json<ApiResponse<EncryptionKeyResponse>>();
 
-// RSA 암호화 함수
+// AES 암호화 함수
 export const encryptPassword = async (password: string): Promise<string> => {
-  const response = await getPublicKey();
-  const encrypt = new JSEncrypt();
-  encrypt.setPublicKey(response.data.publicKey);
-  const encrypted = encrypt.encrypt(password);
-  if (!encrypted) {
-    throw new Error("비밀번호 암호화에 실패했습니다");
-  }
+  const response = await getEncryptionKey();
+  const encrypted = CryptoJS.AES.encrypt(password, response.data.encryptionKey).toString();
   return encrypted;
 };
 
-// 로그인 (RSA 암호화 적용)
+// 로그인 (AES 암호화 적용)
 export const login = async (username: string, password: string) => {
   const encryptedPassword = await encryptPassword(password);
   return apiClient
@@ -40,7 +35,7 @@ export const logout = () => apiClient.post("admin/auth/logout").json<ApiResponse
 
 export const getMe = () => apiClient.get("admin/auth/me").json<ApiResponse<Admin>>();
 
-// 비밀번호 변경 (RSA 암호화 적용)
+// 비밀번호 변경 (AES 암호화 적용)
 export const changePassword = async (currentPassword: string, newPassword: string) => {
   const [encryptedCurrent, encryptedNew] = await Promise.all([encryptPassword(currentPassword), encryptPassword(newPassword)]);
   return apiClient
