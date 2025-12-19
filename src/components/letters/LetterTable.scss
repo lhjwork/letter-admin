@@ -1,0 +1,53 @@
+.letter-type {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+
+  &--story {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+
+  &--letter {
+    background: #fce7f3;
+    color: #be185d;
+  }
+}
+
+.letter-title {
+  font-weight: 500;
+  color: #111827;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+.letter-status {
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+
+  &--created {
+    background: #e5e7eb;
+    color: #374151;
+  }
+
+  &--published {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  &--hidden {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  &--deleted {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+}
