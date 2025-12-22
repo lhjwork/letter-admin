@@ -33,3 +33,21 @@ export const formatRelativeTime = (dateString: string): string => {
   if (days < 7) return `${days}일 전`;
   return formatDate(dateString);
 };
+
+export const formatNumber = (num: number | undefined | null): string => {
+  // null, undefined, NaN 체크
+  if (num == null || isNaN(num)) {
+    return "0";
+  }
+
+  // 숫자로 변환
+  const numValue = Number(num);
+
+  if (numValue >= 1000000) {
+    return (numValue / 1000000).toFixed(1) + "M";
+  }
+  if (numValue >= 1000) {
+    return (numValue / 1000).toFixed(1) + "K";
+  }
+  return numValue.toLocaleString("ko-KR");
+};

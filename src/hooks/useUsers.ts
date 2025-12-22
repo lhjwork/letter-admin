@@ -17,6 +17,38 @@ export const useUser = (id: string) => {
   });
 };
 
+export const useUserDetail = (id: string) => {
+  return useQuery({
+    queryKey: ["admin", "users", id, "detail"],
+    queryFn: () => usersApi.getUserDetail(id),
+    enabled: !!id,
+  });
+};
+
+export const useUserStats = (id: string) => {
+  return useQuery({
+    queryKey: ["admin", "users", id, "stats"],
+    queryFn: () => usersApi.getUserStats(id),
+    enabled: !!id,
+  });
+};
+
+export const useUserLetters = (id: string, params: { page?: number; limit?: number; status?: string }) => {
+  return useQuery({
+    queryKey: ["admin", "users", id, "letters", params],
+    queryFn: () => usersApi.getUserLetters(id, params),
+    enabled: !!id,
+  });
+};
+
+export const useSearchUsers = (query: string, params: { limit?: number; status?: string } = {}) => {
+  return useQuery({
+    queryKey: ["admin", "users", "search", query, params],
+    queryFn: () => usersApi.searchUsers(query, params),
+    enabled: query.length > 0,
+  });
+};
+
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
 

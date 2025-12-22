@@ -68,6 +68,30 @@ export interface User {
   deletedAt?: string;
   createdAt: string;
   updatedAt: string;
+  letterCount?: number;
+  lastActiveAt?: string;
+}
+
+// 사용자 통계 정보
+export interface UserStats {
+  totalLetters: number;
+  totalStories: number;
+  totalViews: number;
+  totalLikes: number;
+  joinedAt: string;
+  lastActiveAt?: string;
+}
+
+// 사용자 상세 정보 (통계 포함)
+export interface UserDetail extends User {
+  stats: UserStats;
+}
+
+// 사용자 편지 목록 응답
+export interface UserLettersResponse {
+  success: boolean;
+  data: Letter[];
+  pagination: Pagination;
 }
 
 // ===== Letter 관련 =====
