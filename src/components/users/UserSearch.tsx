@@ -47,7 +47,7 @@ export default function UserSearch({ onSelectUser, placeholder = "사용자 검�
         <div className="user-search__results">
           {isLoading ? (
             <div className="user-search__loading">
-              <Loading size="sm" />
+              <Loading />
             </div>
           ) : data?.data && data.data.length > 0 ? (
             <ul className="user-search__list">
