@@ -1,34 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useStatistics } from "../../hooks/usePhysicalLetters";
 import { formatNumber } from "../../utils/format";
 import Button from "../common/Button";
 import Loading from "../common/Loading";
 import "./PhysicalLetterAnalytics.scss";
-
-interface AnalyticsData {
-  dailyStats: Array<{
-    date: string;
-    requests: number;
-    revenue: number;
-  }>;
-  regionStats: Array<{
-    region: string;
-    count: number;
-    percentage: number;
-  }>;
-  statusDistribution: Array<{
-    status: string;
-    count: number;
-    percentage: number;
-  }>;
-  averageProcessingTime: number;
-  topPerformingLetters: Array<{
-    letterId: string;
-    title: string;
-    requestCount: number;
-    conversionRate: number;
-  }>;
-}
 
 export default function PhysicalLetterAnalytics() {
   const [dateRange, setDateRange] = useState({
@@ -164,7 +139,7 @@ export default function PhysicalLetterAnalytics() {
           <div className="physical-letter-analytics__card-content">
             {analytics.topPerformingLetters && analytics.topPerformingLetters.length > 0 ? (
               <div className="physical-letter-analytics__top-letters">
-                {analytics.topPerformingLetters.slice(0, 10).map((letter, index) => (
+                {analytics.topPerformingLetters.slice(0, 10).map((letter: { letterId: string; title: string; requestCount: number; conversionRate: number }, index: number) => (
                   <div key={letter.letterId} className="physical-letter-analytics__top-letter-item">
                     <div className="physical-letter-analytics__letter-rank">{index + 1}</div>
                     <div className="physical-letter-analytics__letter-info">

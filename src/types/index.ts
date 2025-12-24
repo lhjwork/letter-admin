@@ -283,6 +283,13 @@ export interface StatisticsData {
     lastMonth: number;
     growth: number;
   };
+  averageProcessingTime?: number;
+  topPerformingLetters?: Array<{
+    letterId: string;
+    title: string;
+    requestCount: number;
+    conversionRate: number;
+  }>;
 }
 
 export interface PhysicalLetterQueryParams {

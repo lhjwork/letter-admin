@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useUpdatePhysicalLetterStatus, useUpdateShippingInfo } from "../../hooks/usePhysicalLetters";
 import { PhysicalLetterRequest, PhysicalLetterStatus } from "../../types";
 import { formatDate } from "../../utils/format";

@@ -1,5 +1,5 @@
 import { PhysicalLetterRequest } from "../../types";
-import { formatDate, formatDateTime } from "../../utils/format";
+import { formatDateTime } from "../../utils/format";
 import Modal from "../common/Modal";
 import Button from "../common/Button";
 import "./DetailModal.scss";

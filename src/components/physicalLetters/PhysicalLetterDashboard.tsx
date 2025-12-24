@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDashboardStats } from "../../hooks/usePhysicalLetters";
 import { formatNumber, formatDate } from "../../utils/format";
 import Button from "../common/Button";

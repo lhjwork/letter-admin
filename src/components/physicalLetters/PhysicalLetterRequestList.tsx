@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { usePhysicalLetters } from "../../hooks/usePhysicalLetters";
 import { usePermission } from "../../hooks/usePermission";
-import { PERMISSIONS, type PhysicalLetterRequest, type PhysicalLetterQueryParams } from "../../types";
+import { PERMISSIONS, type PhysicalLetterRequest, type PhysicalLetterQueryParams, type PhysicalLetterStatus } from "../../types";
 import { formatDate, formatNumber } from "../../utils/format";
 import Button from "../common/Button";
 import Input from "../common/Input";
@@ -86,7 +86,7 @@ export default function PhysicalLetterRequestList() {
         />
         <Select
           value={params.status || ""}
-          onChange={(e) => setParams({ ...params, status: e.target.value, page: 1 })}
+          onChange={(e) => setParams({ ...params, status: e.target.value as PhysicalLetterStatus | "", page: 1 })}
           options={statusOptions}
           className="physical-letter-request-list__status-filter"
         />
