@@ -36,7 +36,7 @@ export const formatRelativeTime = (dateString: string): string => {
 
 export const formatNumber = (num: number | undefined | null): string => {
   // null, undefined 체크
-  if (num == null) {
+  if (num == null || num === undefined) {
     return "0";
   }
 

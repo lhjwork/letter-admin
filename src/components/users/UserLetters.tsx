@@ -88,8 +88,8 @@ export default function UserLetters({ userId }: UserLettersProps) {
                     <span className="user-letters__item-author">작성자: {letter.authorName || "알 수 없음"}</span>
                   </div>
                   <div className="user-letters__item-stats">
-                    <span className="user-letters__item-stat">👁️ {formatNumber(letter.viewCount ?? 0)}</span>
-                    <span className="user-letters__item-stat">❤️ {formatNumber(letter.likeCount ?? 0)}</span>
+                    <span className="user-letters__item-stat">👁️ {formatNumber(letter.viewCount || 0)}</span>
+                    <span className="user-letters__item-stat">❤️ {formatNumber(letter.likeCount || 0)}</span>
                   </div>
                   <div className="user-letters__item-date">{letter.createdAt ? formatDate(letter.createdAt) : "날짜 없음"}</div>
                 </div>
