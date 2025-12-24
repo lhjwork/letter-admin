@@ -1,0 +1,228 @@
+.physical-letter-request-list {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  &__title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+  }
+
+  &__filters {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  &__search {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  &__status-filter {
+    min-width: 160px;
+  }
+
+  &__table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+      background: #f9fafb;
+      padding: 16px 12px;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    td {
+      padding: 16px 12px;
+      border-bottom: 1px solid #f3f4f6;
+      vertical-align: top;
+    }
+  }
+
+  &__row {
+    &:hover {
+      background: #f9fafb;
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  &__letter-info {
+    min-width: 200px;
+  }
+
+  &__letter-title {
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+
+  &__letter-id {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  &__recipient-info {
+    min-width: 140px;
+  }
+
+  &__recipient-name {
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+
+  &__recipient-phone {
+    font-size: 14px;
+    color: #6b7280;
+  }
+
+  &__address {
+    min-width: 200px;
+    max-width: 250px;
+  }
+
+  &__address-main {
+    font-size: 14px;
+    color: #1a1a1a;
+    line-height: 1.4;
+    margin-bottom: 4px;
+  }
+
+  &__address-detail {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.4;
+  }
+
+  &__cost {
+    min-width: 100px;
+  }
+
+  &__total-cost {
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+
+  &__shipping-cost {
+    font-size: 14px;
+    color: #6b7280;
+  }
+
+  &__date {
+    font-size: 14px;
+    color: #6b7280;
+    white-space: nowrap;
+  }
+
+  &__status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &--requested {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    &--confirmed {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    &--processing {
+      background: #e0e7ff;
+      color: #5b21b6;
+    }
+
+    &--writing {
+      background: #f3e8ff;
+      color: #7c2d12;
+    }
+
+    &--sent {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    &--delivered {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    &--cancelled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
+    padding: 48px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .physical-letter-request-list {
+    padding: 16px;
+
+    &__table-container {
+      overflow-x: auto;
+    }
+
+    &__table {
+      min-width: 1000px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .physical-letter-request-list {
+    &__header {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    &__filters {
+      flex-direction: column;
+    }
+
+    &__search,
+    &__status-filter {
+      min-width: auto;
+    }
+  }
+}

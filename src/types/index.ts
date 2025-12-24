@@ -189,3 +189,110 @@ export interface LetterQueryParams {
   sort?: string;
   order?: "asc" | "desc";
 }
+
+// ===== 실물 편지 관련 =====
+export type PhysicalLetterStatus = "requested" | "confirmed" | "processing" | "writing" | "sent" | "delivered" | "failed" | "cancelled";
+
+export interface ShippingAddress {
+  name: string;
+  phone: string;
+  zipCode: string;
+  address1: string;
+  address2?: string;
+  requestedAt: string;
+}
+
+export interface RecipientInfo {
+  name: string;
+  phone: string;
+  zipCode: string;
+  address1: string;
+  address2?: string;
+  memo?: string;
+}
+
+export interface ShippingInfo {
+  trackingNumber?: string;
+  shippingCompany?: string;
+  estimatedDelivery?: string;
+  actualDelivery?: string;
+  shippingCost?: number;
+}
+
+export interface PhysicalLetterRequest {
+  _id: string;
+  letterId:
+    | string
+    | {
+        _id: string;
+        title?: string;
+        ogTitle?: string;
+        content?: string;
+      };
+  title: string;
+  physicalStatus: PhysicalLetterStatus;
+  physicalRequestDate: string;
+  shippingAddress: ShippingAddress;
+  recipientInfo: RecipientInfo;
+  shippingInfo?: ShippingInfo;
+  totalCost?: number;
+  letterCost?: number;
+  shippingCost?: number;
+  physicalNotes?: string;
+  adminNotes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PhysicalLetterStats {
+  total: number;
+  requested: number;
+  confirmed: number;
+  processing: number;
+  writing: number;
+  sent: number;
+  delivered: number;
+  failed: number;
+  cancelled: number;
+  totalRevenue?: number;
+  averageProcessingTime?: number;
+}
+
+export interface DashboardStats extends PhysicalLetterStats {
+  pendingRequests: number;
+  inProgressRequests: number;
+  completedRequests: number;
+  todayRequests: number;
+  thisWeekRequests: number;
+  thisMonthRequests: number;
+}
+
+export interface BulkActionRequest {
+  requestIds: string[];
+  action: "confirm" | "writing" | "sent" | "cancel" | "updateShipping";
+  data?: any;
+}
+
+export interface StatisticsData {
+  statusDistribution: { status: string; count: number; percentage: number }[];
+  dailyRequests: { date: string; count: number }[];
+  regionDistribution: { region: string; count: number }[];
+  revenue: {
+    total: number;
+    thisMonth: number;
+    lastMonth: number;
+    growth: number;
+  };
+}
+
+export interface PhysicalLetterQueryParams {
+  page?: number;
+  limit?: number;
+  status?: PhysicalLetterStatus | "";
+  search?: string;
+  sort?: string;
+  order?: "asc" | "desc";
+  dateFrom?: string;
+  dateTo?: string;
+  region?: string;
+}

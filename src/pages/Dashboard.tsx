@@ -3,6 +3,7 @@ import Loading from "../components/common/Loading";
 import StatsCard from "../components/dashboard/StatsCard";
 import RecentUsers from "../components/dashboard/RecentUsers";
 import RecentLetters from "../components/dashboard/RecentLetters";
+import PhysicalLetterWidget from "../components/physicalLetters/PhysicalLetterWidget";
 import "./Dashboard.scss";
 
 export default function Dashboard() {
@@ -68,6 +69,7 @@ export default function Dashboard() {
       <div className="dashboard__recent">
         <RecentUsers users={stats.recentUsers} />
         <RecentLetters letters={stats.recentLetters} />
+        <PhysicalLetterWidget />
       </div>
     </div>
   );

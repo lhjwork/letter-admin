@@ -1,0 +1,249 @@
+.physical-letter-dashboard {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+
+  &__title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+  }
+
+  &__date-filters {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  &__stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #e5e7eb;
+
+    &--warning {
+      border-left-color: #f59e0b;
+    }
+
+    &--success {
+      border-left-color: #10b981;
+    }
+
+    &--info {
+      border-left-color: #3b82f6;
+    }
+  }
+
+  &__stat-header {
+    margin-bottom: 12px;
+  }
+
+  &__stat-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+  }
+
+  &__stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  &__content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+  }
+
+  &__card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  &__card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  &__card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+  }
+
+  &__card-content {
+    padding: 24px;
+  }
+
+  &__popular-list,
+  &__recent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__popular-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+  }
+
+  &__popular-rank {
+    width: 32px;
+    height: 32px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  &__popular-info {
+    flex: 1;
+  }
+
+  &__popular-title {
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+
+  &__popular-stats {
+    font-size: 14px;
+    color: #6b7280;
+  }
+
+  &__popular-revenue {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  &__recent-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+  }
+
+  &__recent-info {
+    flex: 1;
+  }
+
+  &__recent-title {
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+
+  &__recent-meta {
+    font-size: 14px;
+    color: #6b7280;
+  }
+
+  &__recent-status {
+    text-align: right;
+  }
+
+  &__recent-cost {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 4px;
+  }
+
+  &__status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+
+    &--requested {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    &--confirmed {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    &--processing {
+      background: #e0e7ff;
+      color: #5b21b6;
+    }
+
+    &--writing {
+      background: #f3e8ff;
+      color: #7c2d12;
+    }
+
+    &--sent {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    &--delivered {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    &--cancelled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
+    padding: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .physical-letter-dashboard {
+    padding: 16px;
+
+    &__header {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    &__stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    &__content-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}

@@ -31,6 +31,12 @@ export default function Sidebar() {
       icon: "✉️",
       show: hasPermission(PERMISSIONS.LETTERS_READ),
     },
+    {
+      path: "/physical-letters",
+      label: "실물 편지 관리",
+      icon: "📮",
+      show: hasPermission(PERMISSIONS.LETTERS_READ),
+    },
   ];
 
   return (

@@ -1,0 +1,61 @@
+.physical-letter-filter {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #e1e5e9;
+
+  &__row {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  &__search {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex: 1;
+    min-width: 300px;
+
+    input {
+      flex: 1;
+    }
+  }
+
+  &__controls {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+
+    select {
+      min-width: 120px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+
+    &__row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+    }
+
+    &__search {
+      min-width: auto;
+    }
+
+    &__controls {
+      justify-content: stretch;
+
+      select,
+      button {
+        flex: 1;
+        min-width: auto;
+      }
+    }
+  }
+}

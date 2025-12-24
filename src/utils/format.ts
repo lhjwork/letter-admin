@@ -35,13 +35,18 @@ export const formatRelativeTime = (dateString: string): string => {
 };
 
 export const formatNumber = (num: number | undefined | null): string => {
-  // null, undefined, NaN 체크
-  if (num == null || isNaN(num)) {
+  // null, undefined 체크
+  if (num == null) {
     return "0";
   }
 
   // 숫자로 변환
   const numValue = Number(num);
+
+  // NaN 체크
+  if (isNaN(numValue)) {
+    return "0";
+  }
 
   if (numValue >= 1000000) {
     return (numValue / 1000000).toFixed(1) + "M";

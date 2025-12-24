@@ -1,0 +1,131 @@
+.detail-modal {
+  &__section {
+    margin-bottom: 32px;
+
+    &:last-of-type {
+      margin-bottom: 24px;
+    }
+  }
+
+  &__section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e1e5e9;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  &__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    &--full {
+      grid-column: 1 / -1;
+    }
+  }
+
+  &__label {
+    font-weight: 500;
+    color: #4a5568;
+    min-width: 100px;
+    flex-shrink: 0;
+  }
+
+  &__value {
+    color: #2d3748;
+    word-break: break-word;
+    flex: 1;
+  }
+
+  &__status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+
+    &--requested {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+
+    &--processing {
+      background-color: #fed7aa;
+      color: #c2410c;
+    }
+
+    &--writing {
+      background-color: #e9d5ff;
+      color: #7c3aed;
+    }
+
+    &--sent {
+      background-color: #cffafe;
+      color: #0891b2;
+    }
+
+    &--delivered {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    &--cancelled {
+      background-color: #fecaca;
+      color: #dc2626;
+    }
+
+    &--unknown {
+      background-color: #f1f5f9;
+      color: #64748b;
+    }
+  }
+
+  &__notes {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    color: #2d3748;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    border: 1px solid #e1e5e9;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid #e1e5e9;
+  }
+
+  @media (max-width: 768px) {
+    &__grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    &__item {
+      flex-direction: column;
+      gap: 4px;
+
+      &--full {
+        grid-column: 1;
+      }
+    }
+
+    &__label {
+      min-width: auto;
+      font-size: 14px;
+    }
+
+    &__value {
+      font-size: 14px;
+    }
+  }
+}
