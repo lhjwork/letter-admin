@@ -63,9 +63,32 @@ export const useUpdateLetterPhysicalStatus = () => {
 
   return useMutation({
     mutationFn: (data: LetterStatusUpdateRequest) => lettersApi.updateLetterPhysicalStatus(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "letters"] });
-      queryClient.invalidateQueries({ queryKey: ["admin", "physical-letters"] });
+    onSuccess: async (_, variables) => {
+      console.log("✅ Status update successful, refreshing cache...");
+
+      // 모든 관련 쿼리 무효화
+      await queryClient.invalidateQueries({ queryKey: ["admin", "letters"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin", "physical-letters"] });
+
+      // 상태 검증
+      try {
+        const verification = await lettersApi.verifyLetterStatus(variables.letterId);
+        if (verification.length === 0) {
+          console.warn("⚠️ No physical requests found after update");
+        } else {
+          const hasMatchingStatus = verification.some((req: any) => req.status === variables.status || req.physicalStatus === variables.status);
+          if (!hasMatchingStatus) {
+            console.warn(`⚠️ Status mismatch: expected ${variables.status}, but found:`, verification);
+          } else {
+            console.log("✅ Status verification successful");
+          }
+        }
+      } catch (error) {
+        console.error("❌ Status verification failed:", error);
+      }
+    },
+    onError: (error) => {
+      console.error("❌ Status update failed:", error);
     },
   });
 };

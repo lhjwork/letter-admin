@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLettersWithPhysicalStatus, useUpdateLetterPhysicalStatus, useBulkUpdateLetterPhysicalStatus } from "../hooks/useLetters";
 import { usePermission } from "../hooks/usePermission";
 import { PERMISSIONS, LetterQueryParams, PhysicalLetterStatus, LetterPhysicalInfo } from "../types";
@@ -25,12 +25,18 @@ export default function LettersWithPhysical() {
   const [bulkStatus, setBulkStatus] = useState<PhysicalLetterStatus>("writing");
   const [bulkNote, setBulkNote] = useState("");
 
-  const { data, isLoading, error } = useLettersWithPhysicalStatus(params);
+  const { data, isLoading, error, refetch } = useLettersWithPhysicalStatus(params);
   const updateStatusMutation = useUpdateLetterPhysicalStatus();
   const bulkUpdateMutation = useBulkUpdateLetterPhysicalStatus();
 
   const canRead = hasPermission(PERMISSIONS.LETTERS_READ);
   const canWrite = hasPermission(PERMISSIONS.LETTERS_WRITE);
+
+  // 강제 새로고침 함수
+  const forceRefresh = async () => {
+    console.log("🔄 Force refreshing physical requests list...");
+    await refetch();
+  };
 
   if (!canRead) {
     return (
@@ -65,11 +71,17 @@ export default function LettersWithPhysical() {
     if (!canWrite) return;
 
     try {
+      console.log(`🔄 Updating status for letter ${letterId} to ${status}`);
       await updateStatusMutation.mutateAsync({
         letterId,
         status,
         adminNote: note,
       });
+
+      // 성공 후 강제 새로고침
+      setTimeout(() => {
+        forceRefresh();
+      }, 1000);
     } catch (error) {
       console.error("Status update failed:", error);
     }
@@ -112,6 +124,10 @@ export default function LettersWithPhysical() {
           <Input type="text" placeholder="편지 제목, 작성자로 검색" value={params.search || ""} onChange={(e) => setParams({ ...params, search: e.target.value, page: 1 })} />
 
           <Select value={params.physicalStatus || ""} onChange={(e) => setParams({ ...params, physicalStatus: e.target.value as PhysicalLetterStatus, page: 1 })} options={statusOptions} />
+
+          <Button onClick={forceRefresh} loading={isLoading} size="sm">
+            🔄 새로고침
+          </Button>
         </div>
       </div>
 
@@ -196,7 +212,7 @@ export default function LettersWithPhysical() {
         </table>
       </div>
 
-      {pagination && <Pagination page={pagination.page} totalPages={pagination.totalPages} onPageChange={(page) => setParams({ ...params, page })} />}
+      {pagination && pagination.totalPages > 1 && <Pagination page={pagination.page} totalPages={pagination.totalPages} onPageChange={(page) => setParams({ ...params, page })} />}
     </div>
   );
 }
@@ -211,15 +227,54 @@ interface StatusUpdateDropdownProps {
 function StatusUpdateDropdown({ currentStatus, onUpdate, loading }: StatusUpdateDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [note, setNote] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // 드롭다운 위치 조정
+  useEffect(() => {
+    if (isOpen && dropdownRef.current) {
+      const dropdown = dropdownRef.current;
+      const rect = dropdown.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // 오른쪽으로 넘어가는 경우 왼쪽으로 이동
+      if (rect.right > viewportWidth) {
+        dropdown.style.right = "0";
+        dropdown.style.left = "auto";
+      }
+
+      // 아래로 넘어가는 경우 위쪽으로 이동
+      if (rect.bottom > viewportHeight) {
+        dropdown.style.top = "auto";
+        dropdown.style.bottom = "100%";
+        dropdown.style.marginTop = "0";
+        dropdown.style.marginBottom = "4px";
+      }
+    }
+  }, [isOpen]);
+
+  // 외부 클릭 시 드롭다운 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isOpen]);
 
   const getNextStatuses = (current: PhysicalLetterStatus): PhysicalLetterStatus[] => {
     switch (current) {
       case "requested":
-        return ["writing"];
+        return ["writing", "none"]; // 작성중으로 승인 또는 취소
       case "writing":
-        return ["sent"];
+        return ["sent"]; // 발송완료로 변경
       case "sent":
-        return ["delivered"];
+        return ["delivered"]; // 배송완료로 변경
       default:
         return [];
     }
@@ -232,9 +287,10 @@ function StatusUpdateDropdown({ currentStatus, onUpdate, loading }: StatusUpdate
   }
 
   const statusLabels = {
-    writing: "작성중",
-    sent: "발송됨",
-    delivered: "배송완료",
+    writing: "작성중으로 변경",
+    sent: "발송완료로 변경",
+    delivered: "배송완료로 변경",
+    none: "취소",
   };
 
   const handleUpdate = (status: PhysicalLetterStatus) => {
@@ -250,14 +306,14 @@ function StatusUpdateDropdown({ currentStatus, onUpdate, loading }: StatusUpdate
       </Button>
 
       {isOpen && (
-        <div className="status-update-dropdown__menu">
+        <div ref={dropdownRef} className="status-update-dropdown__menu">
           <div className="status-update-dropdown__note">
-            <Input type="text" placeholder="변경 메모 (선택사항)" value={note} onChange={(e) => setNote(e.target.value)} />
+            <Input type="text" placeholder="관리자 메모 (선택사항)" value={note} onChange={(e) => setNote(e.target.value)} />
           </div>
 
           <div className="status-update-dropdown__actions">
             {nextStatuses.map((status) => (
-              <Button key={status} size="sm" variant="secondary" onClick={() => handleUpdate(status)}>
+              <Button key={status} size="sm" variant={status === "none" ? "secondary" : "primary"} onClick={() => handleUpdate(status)}>
                 {statusLabels[status as keyof typeof statusLabels]}
               </Button>
             ))}

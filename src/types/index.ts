@@ -208,6 +208,7 @@ export interface LetterQueryParams {
 // 편지별 실물 편지 관리 정보
 export interface LetterPhysicalInfo {
   _id: string; // letterId
+  requestId?: string; // 실물 편지 요청 ID (API 호출용)
   title: string;
   authorName: string;
   totalRequests: number;
@@ -233,6 +234,7 @@ export interface PhysicalLetterStats {
 // 편지별 상태 변경 요청
 export interface LetterStatusUpdateRequest {
   letterId: string;
+  requestId?: string; // 실물 편지 요청 ID
   status: PhysicalLetterStatus;
   adminNote?: string;
 }
