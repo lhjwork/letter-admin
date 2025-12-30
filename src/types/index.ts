@@ -99,6 +99,17 @@ export type LetterType = "story" | "letter";
 export type LetterStatus = "created" | "published" | "hidden" | "deleted";
 export type LetterCategory = "가족" | "사랑" | "우정" | "성장" | "위로" | "추억" | "감사" | "기타";
 
+// 실물 편지 상태 (단순화된 편지별 상태)
+export type PhysicalLetterStatus = "none" | "requested" | "writing" | "sent" | "delivered";
+
+// 실물 편지 요약 정보 (편지별 통합 상태)
+export interface PhysicalLetterSummary {
+  totalRequests: number;
+  currentStatus: PhysicalLetterStatus;
+  lastUpdatedAt?: string;
+  adminNote?: string;
+}
+
 export interface Letter {
   _id: string;
   type: LetterType;
@@ -115,6 +126,8 @@ export interface Letter {
   deletedAt?: string;
   createdAt: string;
   updatedAt: string;
+  // 실물 편지 관련 필드 (단순화)
+  physicalLetter?: PhysicalLetterSummary;
 }
 
 // ===== 대시보드 =====
@@ -141,6 +154,7 @@ export interface DashboardStats {
       hidden: number;
     };
   };
+  physicalLetters: PhysicalLetterStats;
   categories: { name: string; count: number }[];
   recentUsers: User[];
   recentLetters: Letter[];
@@ -190,116 +204,67 @@ export interface LetterQueryParams {
   order?: "asc" | "desc";
 }
 
-// ===== 실물 편지 관련 =====
-export type PhysicalLetterStatus = "requested" | "confirmed" | "processing" | "writing" | "sent" | "delivered" | "failed" | "cancelled";
-
-export interface ShippingAddress {
-  name: string;
-  phone: string;
-  zipCode: string;
-  address1: string;
-  address2?: string;
-  requestedAt: string;
-}
-
-export interface RecipientInfo {
-  name: string;
-  phone: string;
-  zipCode: string;
-  address1: string;
-  address2?: string;
-  memo?: string;
-}
-
-export interface ShippingInfo {
-  trackingNumber?: string;
-  shippingCompany?: string;
-  estimatedDelivery?: string;
-  actualDelivery?: string;
-  shippingCost?: number;
-}
-
-export interface PhysicalLetterRequest {
-  _id: string;
-  letterId:
-    | string
-    | {
-        _id: string;
-        title?: string;
-        ogTitle?: string;
-        content?: string;
-      };
+// ===== 실물 편지 관련 (단순화된 편지 중심 관리) =====
+// 편지별 실물 편지 관리 정보
+export interface LetterPhysicalInfo {
+  _id: string; // letterId
   title: string;
-  physicalStatus: PhysicalLetterStatus;
-  physicalRequestDate: string;
-  shippingAddress: ShippingAddress;
-  recipientInfo: RecipientInfo;
-  shippingInfo?: ShippingInfo;
-  totalCost?: number;
-  letterCost?: number;
-  shippingCost?: number;
-  physicalNotes?: string;
-  adminNotes?: string;
+  authorName: string;
+  totalRequests: number;
+  currentStatus: PhysicalLetterStatus;
+  lastUpdatedAt?: string;
+  adminNote?: string;
   createdAt: string;
   updatedAt: string;
 }
 
+// 실물 편지 통계 (단순화)
 export interface PhysicalLetterStats {
   total: number;
+  none: number;
   requested: number;
-  confirmed: number;
-  processing: number;
   writing: number;
   sent: number;
   delivered: number;
-  failed: number;
-  cancelled: number;
   totalRevenue?: number;
   averageProcessingTime?: number;
 }
 
-export interface DashboardStats extends PhysicalLetterStats {
-  pendingRequests: number;
-  inProgressRequests: number;
-  completedRequests: number;
-  todayRequests: number;
-  thisWeekRequests: number;
-  thisMonthRequests: number;
+// 편지별 상태 변경 요청
+export interface LetterStatusUpdateRequest {
+  letterId: string;
+  status: PhysicalLetterStatus;
+  adminNote?: string;
 }
 
-export interface BulkActionRequest {
-  requestIds: string[];
-  action: "confirm" | "writing" | "sent" | "cancel" | "updateShipping";
-  data?: any;
+// 일괄 상태 변경 요청
+export interface BulkLetterStatusUpdateRequest {
+  letterIds: string[];
+  status: PhysicalLetterStatus;
+  adminNote?: string;
 }
 
-export interface StatisticsData {
-  statusDistribution: { status: string; count: number; percentage: number }[];
-  dailyRequests: { date: string; count: number }[];
-  regionDistribution: { region: string; count: number }[];
-  revenue: {
-    total: number;
-    thisMonth: number;
-    lastMonth: number;
-    growth: number;
-  };
-  averageProcessingTime?: number;
-  topPerformingLetters?: Array<{
-    letterId: string;
-    title: string;
-    requestCount: number;
-    conversionRate: number;
-  }>;
-}
-
-export interface PhysicalLetterQueryParams {
+// 편지 목록 조회 파라미터 (실물 편지 상태 포함)
+export interface LetterQueryParams {
   page?: number;
   limit?: number;
-  status?: PhysicalLetterStatus | "";
   search?: string;
+  type?: LetterType | "";
+  category?: LetterCategory | "";
+  status?: LetterStatus | "";
+  physicalStatus?: PhysicalLetterStatus | ""; // 실물 편지 상태 필터 추가
   sort?: string;
   order?: "asc" | "desc";
-  dateFrom?: string;
-  dateTo?: string;
-  region?: string;
+}
+
+// 실물 편지 대시보드 데이터
+export interface PhysicalLetterDashboard {
+  stats: PhysicalLetterStats;
+  recentUpdates: LetterPhysicalInfo[];
+  pendingLetters: LetterPhysicalInfo[];
+  processingTimeStats: {
+    averageRequestToWriting: number;
+    averageWritingToSent: number;
+    averageSentToDelivered: number;
+  };
 }

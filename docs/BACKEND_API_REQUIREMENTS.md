@@ -1,358 +1,197 @@
-# Letter My Admin 백엔드 API 요구사항
+# 백엔드 API 요구사항 문서 - 단순화된 실물 편지 시스템
 
 ## 개요
 
-Letter My 서비스의 관리자 페이지 프론트엔드에서 사용할 새로운 API 엔드포인트들을 구현해야 합니다. 이 문서는 AI 백엔드 개발을 위한 상세한 요구사항을 제공합니다.
+실물 편지 상태 표시 시스템을 단순화하여 편지 중심의 관리 시스템으로 개선합니다.
 
-## 기존 환경 정보
+## 핵심 변경사항
 
-- **백엔드 URL**: `http://localhost:5001`
-- **API Base Path**: `/api/admin`
-- **인증 방식**: JWT Bearer Token
-- **데이터베이스**: MongoDB
-- **기존 구현된 엔드포인트**:
-  - `POST /api/admin/auth/login` - 관리자 로그인
-  - `GET /api/admin/auth/encryption-key` - AES 암호화 키 조회
-  - `GET /api/admin/users` - 사용자 목록 조회
-  - `GET /api/admin/users/:id` - 사용자 상세 조회
-  - `POST /api/admin/users/:id/ban` - 사용자 정지
-  - `POST /api/admin/users/:id/unban` - 사용자 정지 해제
-  - `DELETE /api/admin/users/:id` - 사용자 삭제
+### 기존 문제점
 
-## 🚨 긴급 수정 필요 사항
+- 복잡한 개별 주소 추적 시스템
+- 클릭해서 모달을 열어야 상태 확인 가능
+- 편지 상세 페이지에서 바로 상태를 확인하기 어려움
 
-### 1. 사용자 편지 목록 API 데이터 구조 수정 (최우선)
+### 개선 목표
 
-**현재 문제**: `GET /api/admin/users/:id/letters` 엔드포인트에서 `viewCount`, `likeCount` 필드가 undefined로 반환되어 프론트엔드에서 오류 발생
+- 편지 상세 페이지에서 신청한 사용자의 편지 상태를 바로 표시
+- 클릭 없이 즉시 상태 확인 가능
+- 간단하고 직관적인 UI
+- 편지별 통합 상태 관리
 
-**오류 메시지**:
+## 새로운 데이터 구조
+
+### Letter 모델 확장
+
+```typescript
+interface Letter {
+  _id: string;
+  type: "story" | "letter";
+  userId?: string;
+  title: string;
+  content: string;
+  authorName: string;
+  category: string;
+  status: "created" | "published" | "hidden" | "deleted";
+  viewCount: number;
+  likeCount: number;
+  createdAt: string;
+  updatedAt: string;
+  // 실물 편지 관련 필드 (단순화)
+  physicalLetter?: {
+    totalRequests: number;
+    currentStatus: "none" | "requested" | "writing" | "sent" | "delivered";
+    lastUpdatedAt?: string;
+    adminNote?: string;
+  };
+}
+```
+
+### 단순화된 상태값
+
+- `none`: 실물 편지 신청 없음
+- `requested`: 신청됨 (승인 대기)
+- `writing`: 작성중
+- `sent`: 발송됨
+- `delivered`: 배송완료
+
+## 필요한 API 엔드포인트
+
+### 1. 편지 목록 조회 (실물 편지 상태 포함)
 
 ```
-Uncaught TypeError: Cannot read properties of undefined (reading 'toLocaleString')
-at formatNumber (format.ts:44:14)
+GET /admin/letters
 ```
 
-**수정 필요 사항**:
+**Query Parameters:**
 
-- 모든 Letter 객체에서 `viewCount`, `likeCount` 필드를 숫자로 보장
-- undefined 또는 null인 경우 0으로 기본값 설정
+- `page?: number` - 페이지 번호 (기본값: 1)
+- `limit?: number` - 페이지당 항목 수 (기본값: 10)
+- `search?: string` - 검색어 (편지 제목, 작성자)
+- `type?: string` - 편지 타입 ("story" | "letter")
+- `category?: string` - 카테고리
+- `status?: string` - 편지 상태
+- `physicalStatus?: string` - 실물 편지 상태 필터
+- `sort?: string` - 정렬 필드
+- `order?: string` - 정렬 순서
 
-```javascript
-// 백엔드에서 반환 시 다음과 같이 처리
-const letter = {
-  ...letterData,
-  viewCount: letterData.viewCount || 0,
-  likeCount: letterData.likeCount || 0,
-};
-```
-
-**현재 API 엔드포인트**: `GET /api/admin/users/:id/letters`
-
-**수정된 응답 구조**:
+**Response:**
 
 ```json
 {
   "success": true,
   "data": [
     {
-      "_id": "letter123",
+      "_id": "letter_id",
+      "title": "소중한 친구에게",
+      "authorName": "김철수",
       "type": "letter",
-      "userId": "69365701abedd0b95bbe32d2",
-      "title": "편지 제목",
-      "content": "편지 내용입니다...",
-      "authorName": "작성자명",
-      "category": "가족",
+      "category": "우정",
       "status": "published",
-      "viewCount": 150, // ⚠️ 반드시 숫자로 보장
-      "likeCount": 12, // ⚠️ 반드시 숫자로 보장
-      "hiddenAt": null,
-      "hiddenReason": null,
-      "deletedAt": null,
-      "createdAt": "2024-12-01T00:00:00.000Z",
-      "updatedAt": "2024-12-01T00:00:00.000Z"
+      "viewCount": 150,
+      "likeCount": 25,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "physicalLetter": {
+        "totalRequests": 3,
+        "currentStatus": "writing",
+        "lastUpdatedAt": "2024-01-15T10:30:00Z",
+        "adminNote": "작성 시작"
+      }
     }
   ],
   "pagination": {
     "page": 1,
     "limit": 10,
-    "total": 25,
-    "totalPages": 3
+    "total": 100,
+    "totalPages": 10
   }
 }
 ```
 
-## 새로 구현해야 할 API 엔드포인트
-
-### 1. 사용자 상세 정보 (통계 포함)
+### 2. 실물 편지 관리용 편지 목록 조회
 
 ```
-GET /api/admin/users/:id/detail
+GET /admin/letters/physical
 ```
 
-**목적**: 사용자 기본 정보와 통계 정보를 함께 조회
+**Query Parameters:** (위와 동일)
 
-**인증**: JWT Bearer Token 필요
-
-**권한**: `users.read` 권한 필요
-
-**응답 구조**:
-
-```json
-{
-  "success": true,
-  "data": {
-    "_id": "69365701abedd0b95bbe32d2",
-    "email": "user@example.com",
-    "name": "사용자명",
-    "image": "https://example.com/profile.jpg",
-    "status": "active",
-    "oauthAccounts": [
-      {
-        "provider": "kakao",
-        "providerId": "kakao123456"
-      }
-    ],
-    "addresses": [
-      {
-        "_id": "addr123",
-        "addressName": "집",
-        "recipientName": "홍길동",
-        "zipCode": "12345",
-        "address": "서울시 강남구",
-        "addressDetail": "101동 101호",
-        "phone": "010-1234-5678",
-        "isDefault": true
-      }
-    ],
-    "bannedAt": null,
-    "bannedReason": null,
-    "deletedAt": null,
-    "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2024-12-22T00:00:00.000Z",
-    "letterCount": 15,
-    "lastActiveAt": "2024-12-22T00:00:00.000Z",
-    "stats": {
-      "totalLetters": 15,
-      "totalStories": 8,
-      "totalViews": 1250,
-      "totalLikes": 89,
-      "joinedAt": "2024-01-01T00:00:00.000Z",
-      "lastActiveAt": "2024-12-22T00:00:00.000Z"
-    }
-  }
-}
-```
-
-## 🆕 다중 수신자 실물 편지 관리 시스템 API
-
-### 1. 실물 편지 요청 목록
-
-```
-GET /api/admin/physical-requests?page=1&limit=20&status=requested&search=검색어&dateFrom=2024-01-01&dateTo=2024-12-31&region=서울
-```
-
-**목적**: 실물 편지 요청 목록을 필터링과 페이지네이션으로 조회
-
-**쿼리 파라미터**:
-
-- `page` (optional): 페이지 번호 (기본값: 1)
-- `limit` (optional): 페이지당 항목 수 (기본값: 20, 최대: 100)
-- `status` (optional): 상태 필터 ("requested", "confirmed", "processing", "writing", "sent", "delivered", "failed", "cancelled")
-- `search` (optional): 검색어 (편지 제목, 받는 분 이름, 연락처)
-- `dateFrom` (optional): 시작 날짜 (YYYY-MM-DD)
-- `dateTo` (optional): 종료 날짜 (YYYY-MM-DD)
-- `region` (optional): 지역 필터 (주소 기반)
-
-**응답 구조**:
+**Response:**
 
 ```json
 {
   "success": true,
   "data": [
     {
-      "_id": "req123",
-      "letterId": {
-        "_id": "letter123",
-        "title": "편지 제목",
-        "content": "편지 내용..."
-      },
-      "title": "실물 편지 제목",
-      "physicalStatus": "requested",
-      "physicalRequestDate": "2024-12-20T00:00:00.000Z",
-      "shippingAddress": {
-        "name": "홍길동",
-        "phone": "010-1234-5678",
-        "zipCode": "12345",
-        "address1": "서울시 강남구 테헤란로 123",
-        "address2": "ABC빌딩 101호",
-        "requestedAt": "2024-12-20T00:00:00.000Z"
-      },
-      "recipientInfo": {
-        "name": "홍길동",
-        "phone": "010-1234-5678",
-        "zipCode": "12345",
-        "address1": "서울시 강남구 테헤란로 123",
-        "address2": "ABC빌딩 101호",
-        "memo": "부재 시 경비실에 맡겨주세요"
-      },
-      "shippingInfo": {
-        "trackingNumber": "1234567890",
-        "shippingCompany": "우체국택배",
-        "estimatedDelivery": "2024-12-25T00:00:00.000Z",
-        "actualDelivery": null,
-        "shippingCost": 3000
-      },
-      "totalCost": 8000,
-      "letterCost": 5000,
-      "shippingCost": 3000,
-      "physicalNotes": "고급 편지지 사용 요청",
-      "adminNotes": "VIP 고객, 우선 처리",
-      "createdAt": "2024-12-20T00:00:00.000Z",
-      "updatedAt": "2024-12-20T00:00:00.000Z"
+      "_id": "letter_id",
+      "title": "소중한 친구에게",
+      "authorName": "김철수",
+      "totalRequests": 3,
+      "currentStatus": "writing",
+      "lastUpdatedAt": "2024-01-15T10:30:00Z",
+      "adminNote": "작성 시작",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-15T10:30:00Z"
     }
   ],
   "pagination": {
     "page": 1,
     "limit": 20,
-    "total": 150,
-    "totalPages": 8
+    "total": 50,
+    "totalPages": 3
   }
 }
 ```
 
-### 2. 실물 편지 통계
+### 3. 편지별 실물 편지 상태 업데이트
 
 ```
-GET /api/admin/physical-requests/stats
+PUT /admin/letters/{letterId}/physical-status
 ```
 
-**목적**: 실물 편지 요청 통계 정보 조회
+**Request Body:**
 
-**응답 구조**:
+```json
+{
+  "status": "writing",
+  "adminNote": "작성 시작"
+}
+```
+
+**Response:**
 
 ```json
 {
   "success": true,
   "data": {
-    "total": 500,
-    "requested": 25,
-    "confirmed": 15,
-    "processing": 30,
-    "writing": 20,
-    "sent": 45,
-    "delivered": 350,
-    "failed": 10,
-    "cancelled": 5,
-    "totalRevenue": 2500000,
-    "averageProcessingTime": 3.5
+    "_id": "letter_id",
+    "title": "소중한 친구에게",
+    "authorName": "김철수",
+    "totalRequests": 3,
+    "currentStatus": "writing",
+    "lastUpdatedAt": "2024-01-15T10:30:00Z",
+    "adminNote": "작성 시작"
   }
 }
 ```
 
-### 3. 대시보드 통계
+### 4. 일괄 상태 변경
 
 ```
-GET /api/admin/dashboard/stats
+PUT /admin/letters/bulk-physical-status
 ```
 
-**목적**: 실시간 대시보드용 통계 정보 (30초마다 자동 새로고침)
-
-**응답 구조**:
+**Request Body:**
 
 ```json
 {
-  "success": true,
-  "data": {
-    "total": 500,
-    "requested": 25,
-    "confirmed": 15,
-    "processing": 30,
-    "writing": 20,
-    "sent": 45,
-    "delivered": 350,
-    "failed": 10,
-    "cancelled": 5,
-    "totalRevenue": 2500000,
-    "averageProcessingTime": 3.5,
-    "pendingRequests": 40,
-    "inProgressRequests": 95,
-    "completedRequests": 350,
-    "todayRequests": 12,
-    "thisWeekRequests": 85,
-    "thisMonthRequests": 320
-  }
+  "letterIds": ["letter_id1", "letter_id2", "letter_id3"],
+  "status": "sent",
+  "adminNote": "일괄 발송"
 }
 ```
 
-### 4. 실물 편지 상세 조회
-
-```
-GET /api/admin/physical-requests/:id
-```
-
-**목적**: 특정 실물 편지 요청의 상세 정보 조회
-
-**응답 구조**: 위의 목록 API와 동일한 단일 객체
-
-### 5. 실물 편지 상태 업데이트
-
-```
-PATCH /api/admin/physical-requests/:id
-```
-
-**목적**: 실물 편지 요청의 상태와 메모 업데이트
-
-**요청 본문**:
-
-```json
-{
-  "status": "processing",
-  "notes": "고급 편지지로 작성 시작"
-}
-```
-
-**응답 구조**: 업데이트된 실물 편지 객체
-
-### 6. 배송 정보 업데이트
-
-```
-PATCH /api/admin/physical-requests/:id/shipping
-```
-
-**목적**: 배송 정보 업데이트 (송장번호, 택배사 등)
-
-**요청 본문**:
-
-```json
-{
-  "trackingNumber": "1234567890",
-  "shippingCompany": "우체국택배",
-  "estimatedDelivery": "2024-12-25T00:00:00.000Z",
-  "adminNotes": "배송 시작됨"
-}
-```
-
-### 7. 일괄 처리
-
-```
-POST /api/admin/physical-requests/bulk
-```
-
-**목적**: 여러 요청을 한 번에 처리
-
-**요청 본문**:
-
-```json
-{
-  "requestIds": ["req1", "req2", "req3"],
-  "action": "confirm",
-  "data": {
-    "notes": "일괄 승인 처리"
-  }
-}
-```
-
-**응답 구조**:
+**Response:**
 
 ```json
 {
@@ -364,333 +203,316 @@ POST /api/admin/physical-requests/bulk
 }
 ```
 
-### 8. 통계 및 분석
+### 5. 실물 편지 통계 조회
 
 ```
-GET /api/admin/statistics?start=2024-01-01&end=2024-12-31
+GET /admin/physical-letters/stats
 ```
 
-**목적**: 기간별 상세 통계 및 분석 데이터
-
-**응답 구조**:
+**Response:**
 
 ```json
 {
   "success": true,
   "data": {
-    "statusDistribution": [
-      { "status": "delivered", "count": 350, "percentage": 70 },
-      { "status": "processing", "count": 50, "percentage": 10 }
+    "total": 150,
+    "none": 1000,
+    "requested": 25,
+    "writing": 15,
+    "sent": 8,
+    "delivered": 102,
+    "totalRevenue": 1500000,
+    "averageProcessingTime": 7.5
+  }
+}
+```
+
+### 6. 실물 편지 대시보드 데이터
+
+```
+GET /admin/physical-letters/dashboard
+```
+
+**Query Parameters:**
+
+- `range?: string` - 기간 ("7d", "30d", "90d")
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "stats": {
+      "total": 150,
+      "none": 1000,
+      "requested": 25,
+      "writing": 15,
+      "sent": 8,
+      "delivered": 102
+    },
+    "recentUpdates": [
+      {
+        "_id": "letter_id",
+        "title": "편지 제목",
+        "authorName": "작성자",
+        "totalRequests": 2,
+        "currentStatus": "sent",
+        "lastUpdatedAt": "2024-01-15T10:30:00Z"
+      }
     ],
-    "dailyRequests": [
-      { "date": "2024-12-01", "count": 15 },
-      { "date": "2024-12-02", "count": 22 }
+    "pendingLetters": [
+      {
+        "_id": "letter_id",
+        "title": "편지 제목",
+        "authorName": "작성자",
+        "totalRequests": 1,
+        "currentStatus": "requested",
+        "lastUpdatedAt": "2024-01-10T09:00:00Z"
+      }
     ],
-    "regionDistribution": [
-      { "region": "서울", "count": 200 },
-      { "region": "경기", "count": 150 }
-    ],
-    "revenue": {
-      "total": 2500000,
-      "thisMonth": 320000,
-      "lastMonth": 280000,
-      "growth": 14.3
+    "processingTimeStats": {
+      "averageRequestToWriting": 2.5,
+      "averageWritingToSent": 3.0,
+      "averageSentToDelivered": 2.0
     }
   }
 }
 ```
 
-### 9. 데이터 내보내기
+## 기존 API 개선사항
+
+### 1. 사용자 통계 정보 조회
 
 ```
-GET /api/admin/physical-requests/export?status=delivered&dateFrom=2024-01-01&dateTo=2024-12-31
+GET /admin/users/:userId/stats
 ```
 
-**목적**: 필터링된 데이터를 CSV 또는 Excel 형태로 내보내기
-
-**응답**: 실물 편지 요청 배열 (CSV 변환은 프론트엔드에서 처리)
-
-## 🆕 누적 실물 편지 관리 시스템 추가 API
-
-### 10. 누적 대시보드 데이터
-
-```
-GET /api/admin/physical-letters/dashboard?range=7d
-```
-
-**목적**: 누적 실물 편지 관리 시스템의 대시보드 데이터 조회
-
-**쿼리 파라미터**:
-
-- `range` (optional): 기간 필터 ("7d", "30d", "90d") - 기본값: "7d"
-
-**응답 구조**:
+**Response:**
 
 ```json
 {
   "success": true,
   "data": {
-    "totalRequests": 500,
-    "pendingRequests": 40,
-    "completedRequests": 350,
-    "totalRevenue": 2500000,
-    "popularLetters": [
-      {
-        "letterId": "letter123",
-        "title": "사랑하는 가족에게",
-        "requestCount": 45,
-        "totalRevenue": 225000
-      }
-    ],
-    "recentRequests": [
-      {
-        "id": "req123",
-        "letterId": "letter123",
-        "letterTitle": "사랑하는 가족에게",
-        "recipientName": "홍길동",
-        "status": "requested",
-        "cost": 5000,
-        "createdAt": "2024-12-20T00:00:00.000Z"
-      }
-    ]
+    "totalLetters": 25,
+    "totalStories": 15,
+    "totalViews": 1250,
+    "totalLikes": 89,
+    "joinedAt": "2024-01-15T09:30:00Z",
+    "lastActiveAt": "2024-02-20T14:22:00Z"
   }
 }
 ```
 
-### 11. 분석 데이터
+### 2. 사용자별 편지 목록 조회
 
 ```
-GET /api/admin/physical-letters/analytics
+GET /admin/users/:userId/letters
 ```
 
-**목적**: 실물 편지 시스템의 상세 분석 데이터 조회
+**Query Parameters:**
 
-**응답 구조**:
+- `page?: number` - 페이지 번호 (기본값: 1)
+- `limit?: number` - 페이지당 항목 수 (기본값: 10)
+- `type?: string` - 편지 타입 필터 ("story" | "letter")
+- `status?: string` - 상태 필터 ("created" | "published" | "hidden" | "deleted")
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "letter_id",
+      "type": "story",
+      "title": "편지 제목",
+      "content": "편지 내용",
+      "category": "가족",
+      "status": "published",
+      "viewCount": 45,
+      "likeCount": 12,
+      "createdAt": "2024-01-20T10:15:00Z",
+      "updatedAt": "2024-01-20T10:15:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 25,
+    "totalPages": 3
+  }
+}
+```
+
+### 3. 대시보드 통계 API 개선
+
+```
+GET /admin/dashboard/stats
+```
+
+**Response에 physicalLetters 필드 추가:**
 
 ```json
 {
   "success": true,
   "data": {
-    "dailyStats": [
-      {
-        "date": "2024-12-01",
-        "requests": 15,
-        "revenue": 75000
-      }
+    "users": {
+      /* 기존 사용자 통계 */
+    },
+    "letters": {
+      /* 기존 편지 통계 */
+    },
+    "physicalLetters": {
+      "total": 150,
+      "none": 1000,
+      "requested": 25,
+      "writing": 15,
+      "sent": 8,
+      "delivered": 102,
+      "totalRevenue": 1500000,
+      "averageProcessingTime": 7.5
+    },
+    "categories": [
+      /* 기존 카테고리 통계 */
     ],
-    "regionStats": [
-      {
-        "region": "서울",
-        "count": 200,
-        "percentage": 40
-      }
+    "recentUsers": [
+      /* 기존 최근 사용자 */
     ],
-    "statusDistribution": [
-      {
-        "status": "delivered",
-        "count": 350,
-        "percentage": 70
-      }
-    ],
-    "averageProcessingTime": 3.5,
-    "topPerformingLetters": [
-      {
-        "letterId": "letter123",
-        "title": "사랑하는 가족에게",
-        "requestCount": 45,
-        "conversionRate": 12.5
-      }
+    "recentLetters": [
+      /* 기존 최근 편지 */
     ]
   }
 }
 ```
 
-## 데이터 모델 정의
+## 데이터베이스 설계
 
-### PhysicalLetterRequest 스키마
+### 실물 편지 상태 관리 방식
+
+#### 옵션 1: Letter 모델에 직접 포함 (권장)
 
 ```javascript
-const physicalLetterRequestSchema = {
+// Letter 컬렉션
+{
+  _id: ObjectId,
+  title: String,
+  content: String,
+  authorName: String,
+  // ... 기존 필드들
+
+  // 실물 편지 관련 필드
+  physicalLetter: {
+    totalRequests: Number,
+    currentStatus: String, // "none" | "requested" | "writing" | "sent" | "delivered"
+    lastUpdatedAt: Date,
+    adminNote: String,
+    // 상태 변경 이력
+    statusHistory: [{
+      status: String,
+      changedAt: Date,
+      changedBy: ObjectId, // Admin ID
+      note: String
+    }]
+  }
+}
+```
+
+#### 옵션 2: 별도 컬렉션으로 관리
+
+```javascript
+// PhysicalLetterStatus 컬렉션
+{
   _id: ObjectId,
   letterId: ObjectId, // Letter 컬렉션 참조
-  title: String,
-  physicalStatus: {
-    type: String,
-    enum: ["requested", "confirmed", "processing", "writing", "sent", "delivered", "failed", "cancelled"],
-    default: "requested",
-  },
-  physicalRequestDate: Date,
-  shippingAddress: {
-    name: String,
-    phone: String,
-    zipCode: String,
-    address1: String,
-    address2: String,
-    requestedAt: Date,
-  },
-  recipientInfo: {
-    name: String,
-    phone: String,
-    zipCode: String,
-    address1: String,
-    address2: String,
-    memo: String,
-  },
-  shippingInfo: {
-    trackingNumber: String,
-    shippingCompany: String,
-    estimatedDelivery: Date,
-    actualDelivery: Date,
-    shippingCost: Number,
-  },
-  totalCost: Number,
-  letterCost: Number,
-  shippingCost: Number,
-  physicalNotes: String,
-  adminNotes: String,
+  totalRequests: Number,
+  currentStatus: String,
+  lastUpdatedAt: Date,
+  adminNote: String,
+  statusHistory: [/* 상태 변경 이력 */],
   createdAt: Date,
-  updatedAt: Date,
-};
+  updatedAt: Date
+}
 ```
 
-## 보안 및 권한 요구사항
+## 구현 고려사항
 
-### 1. 인증 검증
+### 1. 성능 최적화
 
-- 모든 엔드포인트는 JWT 토큰 검증 필요
-- Authorization 헤더: `Bearer <token>`
+- Letter 컬렉션에 `physicalLetter.currentStatus` 인덱스 추가
+- 편지 목록 조회 시 실물 편지 상태 필터링 최적화
+- 통계 계산을 위한 집계 파이프라인 최적화
 
-### 2. 권한 검증
+### 2. 상태 전환 규칙
 
-- `letters.read`: 실물 편지 조회 권한
-- `letters.write`: 실물 편지 수정 권한
-- `letters.delete`: 실물 편지 삭제 권한
-
-### 3. 데이터 보안
-
-- 개인정보 (이름, 연락처, 주소) 암호화 저장 권장
-- 관리자 액션 로그 기록
-
-## 성능 요구사항
-
-### 1. 인덱스 생성
-
-```javascript
-// 필수 인덱스
-db.physicalLetterRequests.createIndex({ physicalStatus: 1 });
-db.physicalLetterRequests.createIndex({ physicalRequestDate: -1 });
-db.physicalLetterRequests.createIndex({ "shippingAddress.name": "text", title: "text" });
-db.physicalLetterRequests.createIndex({ createdAt: -1 });
-
-// 복합 인덱스
-db.physicalLetterRequests.createIndex({
-  physicalStatus: 1,
-  physicalRequestDate: -1,
-});
+```
+none → requested (사용자가 실물 편지 신청)
+requested → writing (관리자가 작성 시작)
+writing → sent (관리자가 발송 처리)
+sent → delivered (배송 완료 처리)
 ```
 
-### 2. 응답 시간 목표
+### 3. 권한 관리
 
-- 목록 조회: 300ms 이내
-- 통계 조회: 500ms 이내
-- 상태 업데이트: 200ms 이내
+- 편지 읽기 권한: `LETTERS_READ`
+- 실물 편지 상태 변경 권한: `LETTERS_WRITE`
+- 일괄 상태 변경: 추가 권한 확인
 
-## 오류 처리
+### 4. 로깅 및 감사
 
-### 주요 오류 코드
+- 상태 변경 시 이력 기록
+- 관리자 작업 로그
+- 일괄 변경 작업 추적
 
-- `PHYSICAL_REQUEST_NOT_FOUND`: 실물 편지 요청을 찾을 수 없음 (404)
-- `INVALID_STATUS_TRANSITION`: 잘못된 상태 전환 (400)
-- `BULK_ACTION_FAILED`: 일괄 처리 실패 (400)
+### 5. 알림 시스템
 
-## 🔄 업데이트된 구현 우선순위
+- 상태 변경 시 사용자 알림
+- 오래된 신청 알림 (7일 이상 대기)
+- 관리자 대시보드 알림
 
-1. **최우선**: 사용자 편지 목록 API의 viewCount/likeCount 수정 ⚠️
-2. **높음**: 실물 편지 목록 및 상세 조회 API
-3. **높음**: 실물 편지 상태 업데이트 API
-4. **높음**: 누적 대시보드 데이터 API
-5. **중간**: 통계 및 대시보드 API
-6. **중간**: 분석 데이터 API
-7. **중간**: 일괄 처리 및 배송 정보 업데이트 API
-8. **낮음**: 데이터 내보내기 및 고급 분석 API
+## 마이그레이션 가이드
+
+### 기존 데이터 변환
+
+1. 기존 `AuthorApprovalPhysicalRequest` 컬렉션 데이터 분석
+2. 편지별로 실물 편지 신청 수 집계
+3. 가장 최신 상태를 `currentStatus`로 설정
+4. Letter 모델에 `physicalLetter` 필드 추가
+5. 기존 컬렉션 데이터 정리
+
+### 상태값 매핑
+
+```
+기존 → 새로운
+requested → requested
+confirmed → writing
+processing → writing
+writing → writing
+sent → sent
+delivered → delivered
+failed → requested (재처리 필요)
+cancelled → none
+```
 
 ## 테스트 케이스
 
-### 1. 사용자 편지 목록 API (긴급 수정)
+### 1. API 테스트
 
-```bash
-# 정상 케이스 - viewCount, likeCount가 숫자로 반환되어야 함
-GET /api/admin/users/69365701abedd0b95bbe32d2/letters?page=1&limit=10
-Authorization: Bearer <valid_token>
+- 편지 목록 조회 (실물 편지 상태 포함)
+- 상태 업데이트 (개별/일괄)
+- 권한별 접근 제어
+- 잘못된 상태 전환 방지
 
-# 예상 응답에서 확인해야 할 사항:
-# - viewCount: 숫자 (undefined 아님)
-# - likeCount: 숫자 (undefined 아님)
-```
+### 2. 성능 테스트
 
-### 2. 실물 편지 목록 API
+- 대량 편지 목록 조회 성능
+- 실물 편지 상태 필터링 성능
+- 일괄 상태 변경 성능
 
-```bash
-# 정상 케이스
-GET /api/admin/physical-requests?page=1&limit=10&status=requested
-Authorization: Bearer <valid_token>
+### 3. UI/UX 테스트
 
-# 필터링 테스트
-GET /api/admin/physical-requests?search=홍길동&dateFrom=2024-01-01&dateTo=2024-12-31
-Authorization: Bearer <valid_token>
-```
+- 편지 목록에서 실물 편지 상태 표시
+- 상태 변경 드롭다운 동작
+- 일괄 선택 및 변경 기능
 
-### 3. 상태 업데이트 API
-
-```bash
-# 정상 케이스
-PATCH /api/admin/physical-requests/req123
-Authorization: Bearer <valid_token>
-Content-Type: application/json
-
-{
-  "status": "processing",
-  "notes": "작업 시작"
-}
-```
-
-## 📋 누적 시스템 특징
-
-### 1. 편지별 누적 관리
-
-- 동일한 편지에 대한 여러 실물 편지 신청을 효율적으로 관리
-- 편지별 인기도 및 수익 추적
-- 편지별 전환율 분석
-
-### 2. 개별 신청 상태 추적
-
-- 각 신청의 독립적인 상태 관리
-- 상세한 배송 정보 및 추적
-- 관리자 메모 및 히스토리 관리
-
-### 3. 통계 및 분석
-
-- 실시간 대시보드 모니터링
-- 지역별, 상태별 분포 분석
-- 수익 및 성장률 추적
-- 처리 시간 최적화 분석
-
-### 4. 관리자 권한 시스템
-
-- 역할별 접근 권한 제어
-- 액션 로그 및 감사 추적
-- 일괄 처리 권한 관리
-
-이 누적 실물 편지 관리 시스템을 통해 관리자는 편지별로 누적되는 신청을 효율적으로 관리하고, 상세한 분석을 통해 서비스를 최적화할 수 있습니다.
-
----
-
-## ⚠️ 즉시 해결해야 할 문제
-
-**현재 프론트엔드에서 발생하는 오류**:
-
-- URL: `http://localhost:5173/users/69365701abedd0b95bbe32d2`
-- 오류: `Cannot read properties of undefined (reading 'toLocaleString')`
-- 원인: `GET /api/admin/users/:id/letters` API에서 `viewCount`, `likeCount`가 undefined로 반환됨
-
-**해결 방법**: 백엔드에서 모든 Letter 객체의 `viewCount`, `likeCount` 필드를 숫자로 보장하도록 수정
+이 단순화된 시스템으로 사용자는 편지를 읽으면서 자연스럽게 실물 편지 상태를 확인할 수 있고, 관리자는 더 효율적으로 상태를 관리할 수 있습니다.

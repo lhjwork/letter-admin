@@ -9,7 +9,7 @@ interface PhysicalLetterStatsProps {
 export default function PhysicalLetterStats({ stats }: PhysicalLetterStatsProps) {
   const statItems = [
     {
-      label: "전체 신청",
+      label: "전체",
       value: formatNumber(stats.total),
       icon: "📋",
       color: "blue",
@@ -19,12 +19,6 @@ export default function PhysicalLetterStats({ stats }: PhysicalLetterStatsProps)
       value: formatNumber(stats.requested),
       icon: "📝",
       color: "orange",
-    },
-    {
-      label: "처리중",
-      value: formatNumber(stats.processing),
-      icon: "⚙️",
-      color: "yellow",
     },
     {
       label: "작성중",
@@ -41,7 +35,7 @@ export default function PhysicalLetterStats({ stats }: PhysicalLetterStatsProps)
     {
       label: "배송완료",
       value: formatNumber(stats.delivered),
-      icon: "✅",
+      icon: "🎯",
       color: "green",
     },
   ];
@@ -62,10 +56,13 @@ export default function PhysicalLetterStats({ stats }: PhysicalLetterStatsProps)
         ))}
       </div>
 
-      <div className="physical-letter-stats__completion">
-        <div className="physical-letter-stats__completion-label">완료율: {completionRate}%</div>
-        <div className="physical-letter-stats__progress">
-          <div className="physical-letter-stats__progress-bar" style={{ width: `${completionRate}%` }} />
+      <div className="physical-letter-stats__metrics">
+        <div className="physical-letter-stats__metric">
+          <div className="physical-letter-stats__metric-label">완료율</div>
+          <div className="physical-letter-stats__metric-value">{completionRate}%</div>
+          <div className="physical-letter-stats__progress">
+            <div className="physical-letter-stats__progress-bar physical-letter-stats__progress-bar--blue" style={{ width: `${completionRate}%` }} />
+          </div>
         </div>
       </div>
     </div>

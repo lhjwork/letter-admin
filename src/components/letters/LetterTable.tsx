@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import type { Letter } from "../../types";
 import Table from "../common/Table";
+import LetterPhysicalStatus from "./LetterPhysicalStatus";
 import { LETTER_TYPE_LABELS, LETTER_STATUS_LABELS } from "../../utils/constants";
 import { formatDate } from "../../utils/format";
 import "./LetterTable.scss";
@@ -8,9 +9,10 @@ import "./LetterTable.scss";
 interface LetterTableProps {
   letters: Letter[];
   loading?: boolean;
+  showPhysicalStatus?: boolean;
 }
 
-export default function LetterTable({ letters, loading }: LetterTableProps) {
+export default function LetterTable({ letters, loading, showPhysicalStatus = true }: LetterTableProps) {
   const navigate = useNavigate();
 
   const columns = [
@@ -23,7 +25,12 @@ export default function LetterTable({ letters, loading }: LetterTableProps) {
     {
       key: "title",
       header: "제목",
-      render: (letter: Letter) => <span className="letter-title">{letter.title}</span>,
+      render: (letter: Letter) => (
+        <div className="letter-title-cell">
+          <span className="letter-title">{letter.title}</span>
+          {showPhysicalStatus && letter.physicalLetter && <LetterPhysicalStatus physicalLetter={letter.physicalLetter} compact />}
+        </div>
+      ),
     },
     { key: "authorName", header: "작성자" },
     { key: "category", header: "카테고리" },

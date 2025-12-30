@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as lettersApi from "../api/letters";
-import type { LetterQueryParams, LetterStatus } from "../types";
+import type { LetterQueryParams, LetterStatus, LetterStatusUpdateRequest, BulkLetterStatusUpdateRequest } from "../types";
 
 export const useLetters = (params: LetterQueryParams) => {
   return useQuery({
@@ -46,6 +46,38 @@ export const useDeleteLetter = () => {
     mutationFn: (id: string) => lettersApi.deleteLetter(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "letters"] });
+    },
+  });
+};
+
+// 실물 편지 상태 관리 훅들
+export const useLettersWithPhysicalStatus = (params: LetterQueryParams) => {
+  return useQuery({
+    queryKey: ["admin", "letters", "physical", params],
+    queryFn: () => lettersApi.getLettersWithPhysicalStatus(params),
+  });
+};
+
+export const useUpdateLetterPhysicalStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: LetterStatusUpdateRequest) => lettersApi.updateLetterPhysicalStatus(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "letters"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "physical-letters"] });
+    },
+  });
+};
+
+export const useBulkUpdateLetterPhysicalStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: BulkLetterStatusUpdateRequest) => lettersApi.bulkUpdateLetterPhysicalStatus(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "letters"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "physical-letters"] });
     },
   });
 };

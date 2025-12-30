@@ -10,6 +10,7 @@ import AdminDetailPage from "./pages/AdminDetail";
 import Users from "./pages/Users";
 import UserDetailPage from "./pages/UserDetail";
 import Letters from "./pages/Letters";
+import LettersWithPhysical from "./pages/LettersWithPhysical";
 import LetterDetailPage from "./pages/LetterDetail";
 import PhysicalLetters from "./pages/PhysicalLetters";
 import ChangePassword from "./pages/ChangePassword";
@@ -72,6 +73,7 @@ function AppRoutes() {
         <Route path="users" element={<Users />} />
         <Route path="users/:id" element={<UserDetailPage />} />
         <Route path="letters" element={<Letters />} />
+        <Route path="letters/physical" element={<LettersWithPhysical />} />
         <Route path="letters/:id" element={<LetterDetailPage />} />
         <Route path="physical-letters" element={<PhysicalLetters />} />
         <Route path="change-password" element={<ChangePassword />} />

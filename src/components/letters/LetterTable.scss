@@ -15,6 +15,12 @@
   }
 }
 
+.letter-title-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .letter-title {
   font-weight: 500;
   color: #111827;

@@ -21,7 +21,7 @@ export default function PhysicalLetterWidget() {
   if (!stats) return null;
 
   const completionRate = stats.total > 0 ? Math.round((stats.delivered / stats.total) * 100) : 0;
-  const pendingCount = stats.requested + stats.processing + stats.writing;
+  const pendingCount = stats.requested + stats.writing;
 
   return (
     <div className="physical-letter-widget">
@@ -63,9 +63,9 @@ export default function PhysicalLetterWidget() {
           <span className="physical-letter-widget__status-count">{formatNumber(stats.requested)}</span>
         </div>
         <div className="physical-letter-widget__status-item">
-          <span className="physical-letter-widget__status-dot physical-letter-widget__status-dot--processing"></span>
-          <span className="physical-letter-widget__status-label">처리중</span>
-          <span className="physical-letter-widget__status-count">{formatNumber(stats.processing)}</span>
+          <span className="physical-letter-widget__status-dot physical-letter-widget__status-dot--writing"></span>
+          <span className="physical-letter-widget__status-label">작성중</span>
+          <span className="physical-letter-widget__status-count">{formatNumber(stats.writing)}</span>
         </div>
         <div className="physical-letter-widget__status-item">
           <span className="physical-letter-widget__status-dot physical-letter-widget__status-dot--sent"></span>

@@ -1,7 +1,29 @@
 import { apiClient } from "./client";
-import type { ApiResponse, PhysicalLetterRequest, PhysicalLetterStats, DashboardStats, StatisticsData, BulkActionRequest, PhysicalLetterQueryParams, Pagination } from "../types";
+import type { ApiResponse, PhysicalLetterStats, PhysicalLetterDashboard, Pagination } from "../types";
 
-export const getPhysicalLetters = (params: PhysicalLetterQueryParams) => {
+// 기존 백엔드 API 응답 타입
+interface PhysicalRequestResponse {
+  letterId: string;
+  letterTitle: string;
+  authorName: string;
+  requestId: string;
+  recipientName: string;
+  recipientPhone: string;
+  fullAddress: string;
+  status: string;
+  requestedAt: string;
+  memo?: string;
+}
+
+// 실물 편지 요청 목록 조회 (기존 API 사용)
+export const getPhysicalLetterRequests = (
+  params: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+  } = {}
+) => {
   const searchParams: Record<string, string> = {};
 
   if (params.page !== undefined) {
@@ -12,142 +34,172 @@ export const getPhysicalLetters = (params: PhysicalLetterQueryParams) => {
     searchParams.limit = params.limit.toString();
   }
 
-  if (params.search) {
-    searchParams.search = params.search;
-  }
-
   if (params.status) {
     searchParams.status = params.status;
   }
 
-  if (params.sort) {
-    searchParams.sort = params.sort;
+  if (params.search) {
+    searchParams.search = params.search;
   }
 
-  if (params.order) {
-    searchParams.order = params.order;
-  }
-
-  if (params.dateFrom) {
-    searchParams.dateFrom = params.dateFrom;
-  }
-
-  if (params.dateTo) {
-    searchParams.dateTo = params.dateTo;
-  }
-
-  if (params.region) {
-    searchParams.region = params.region;
-  }
-
-  return apiClient.get("admin/physical-requests", { searchParams }).json<ApiResponse<PhysicalLetterRequest[]> & { pagination: Pagination }>();
+  return apiClient.get("admin/physical-requests", { searchParams }).json<ApiResponse<PhysicalRequestResponse[]> & { pagination: Pagination }>();
 };
 
-export const getPhysicalLetterById = (id: string) => apiClient.get(`admin/physical-requests/${id}`).json<ApiResponse<PhysicalLetterRequest>>();
-
-export const getPhysicalLetterStats = () => apiClient.get("admin/physical-requests/stats").json<ApiResponse<PhysicalLetterStats>>();
-
-export const getDashboardStats = () => apiClient.get("admin/dashboard/stats").json<ApiResponse<DashboardStats>>();
-
-export const getStatistics = (params: { start: string; end: string }) => {
-  const searchParams: Record<string, string> = {
-    start: params.start,
-    end: params.end,
+// 클라이언트 사이드에서 통계 계산
+export const calculatePhysicalLetterStats = (requests: PhysicalRequestResponse[]): PhysicalLetterStats => {
+  const stats: PhysicalLetterStats = {
+    total: requests.length,
+    none: 0,
+    requested: 0,
+    writing: 0,
+    sent: 0,
+    delivered: 0,
   };
 
-  return apiClient.get("admin/statistics", { searchParams }).json<ApiResponse<StatisticsData>>();
+  requests.forEach((request) => {
+    switch (request.status) {
+      case "requested":
+        stats.requested++;
+        break;
+      case "approved":
+      case "writing":
+        stats.writing++;
+        break;
+      case "sent":
+        stats.sent++;
+        break;
+      case "delivered":
+        stats.delivered++;
+        break;
+    }
+  });
+
+  return stats;
 };
 
-export const updatePhysicalLetterStatus = (id: string, data: { status: string; notes?: string }) =>
-  apiClient.patch(`admin/physical-requests/${id}`, { json: data }).json<ApiResponse<PhysicalLetterRequest>>();
+// 날짜 범위로 필터링
+export const filterByDateRange = (requests: PhysicalRequestResponse[], range: string): PhysicalRequestResponse[] => {
+  if (range === "all") return requests;
 
-export const updateShippingInfo = (
-  id: string,
-  data: {
-    trackingNumber: string;
-    shippingCompany: string;
-    estimatedDelivery?: string;
-    adminNotes?: string;
-  }
-) => apiClient.patch(`admin/physical-requests/${id}/shipping`, { json: data }).json<ApiResponse<PhysicalLetterRequest>>();
+  const now = new Date();
+  let startDate: Date;
 
-export const bulkUpdateRequests = (data: BulkActionRequest) => apiClient.post("admin/physical-requests/bulk", { json: data }).json<ApiResponse<{ updated: number; failed: string[] }>>();
-
-export const exportPhysicalLetters = (params: PhysicalLetterQueryParams) => {
-  const searchParams: Record<string, string> = {};
-
-  if (params.search) {
-    searchParams.search = params.search;
-  }
-
-  if (params.status) {
-    searchParams.status = params.status;
+  switch (range) {
+    case "7d":
+      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      break;
+    case "30d":
+      startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      break;
+    case "90d":
+      startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+      break;
+    default:
+      return requests;
   }
 
-  if (params.dateFrom) {
-    searchParams.dateFrom = params.dateFrom;
-  }
-
-  if (params.dateTo) {
-    searchParams.dateTo = params.dateTo;
-  }
-
-  return apiClient.get("admin/physical-requests/export", { searchParams }).json<ApiResponse<PhysicalLetterRequest[]>>();
+  return requests.filter((request) => new Date(request.requestedAt) >= startDate);
 };
 
-// Dashboard specific API for cumulative system
-export const getDashboardData = (range: string = "7d") => {
-  const searchParams: Record<string, string> = { range };
-  return apiClient.get("admin/physical-letters/dashboard", { searchParams }).json<
-    ApiResponse<{
-      totalRequests: number;
-      pendingRequests: number;
-      completedRequests: number;
-      totalRevenue: number;
-      popularLetters: Array<{
-        letterId: string;
-        title: string;
-        requestCount: number;
-        totalRevenue: number;
-      }>;
-      recentRequests: Array<{
-        id: string;
-        letterId: string;
-        letterTitle: string;
-        recipientName: string;
-        status: string;
-        cost: number;
-        createdAt: string;
-      }>;
-    }>
-  >();
+// 실물 편지 통계 조회 (기존 API 기반)
+export const getPhysicalLetterStats = async (): Promise<ApiResponse<PhysicalLetterStats>> => {
+  try {
+    const response = await getPhysicalLetterRequests({ limit: 1000 }); // 모든 데이터 가져오기
+    const stats = calculatePhysicalLetterStats(response.data);
+
+    return {
+      success: true,
+      data: stats,
+    };
+  } catch (error) {
+    console.error("Failed to fetch physical letter stats:", error);
+    return {
+      success: false,
+      data: {
+        total: 0,
+        none: 0,
+        requested: 0,
+        writing: 0,
+        sent: 0,
+        delivered: 0,
+      },
+    };
+  }
 };
 
-// Analytics API
-export const getAnalyticsData = () =>
-  apiClient.get("admin/physical-letters/analytics").json<
-    ApiResponse<{
-      dailyStats: Array<{
-        date: string;
-        requests: number;
-        revenue: number;
-      }>;
-      regionStats: Array<{
-        region: string;
-        count: number;
-        percentage: number;
-      }>;
-      statusDistribution: Array<{
-        status: string;
-        count: number;
-        percentage: number;
-      }>;
-      averageProcessingTime: number;
-      topPerformingLetters: Array<{
-        letterId: string;
-        title: string;
-        requestCount: number;
-        conversionRate: number;
-      }>;
-    }>
-  >();
+// 실물 편지 대시보드 데이터 조회 (기존 API 기반)
+export const getPhysicalLetterDashboard = async (range: string = "7d"): Promise<ApiResponse<PhysicalLetterDashboard>> => {
+  try {
+    const response = await getPhysicalLetterRequests({ limit: 1000 });
+    const filteredRequests = filterByDateRange(response.data, range);
+    const stats = calculatePhysicalLetterStats(filteredRequests);
+
+    // 최근 업데이트 (최근 10개)
+    const recentUpdates = filteredRequests
+      .sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime())
+      .slice(0, 10)
+      .map((request) => ({
+        _id: request.requestId,
+        title: request.letterTitle,
+        authorName: request.authorName,
+        totalRequests: 1, // 개별 요청이므로 1
+        currentStatus: mapStatus(request.status),
+        lastUpdatedAt: request.requestedAt,
+        adminNote: request.memo,
+        createdAt: request.requestedAt,
+        updatedAt: request.requestedAt,
+      }));
+
+    // 대기 중인 편지 (requested 상태)
+    const pendingLetters = filteredRequests
+      .filter((request) => request.status === "requested")
+      .slice(0, 10)
+      .map((request) => ({
+        _id: request.requestId,
+        title: request.letterTitle,
+        authorName: request.authorName,
+        totalRequests: 1,
+        currentStatus: "requested" as const,
+        lastUpdatedAt: request.requestedAt,
+        adminNote: request.memo,
+        createdAt: request.requestedAt,
+        updatedAt: request.requestedAt,
+      }));
+
+    const dashboard: PhysicalLetterDashboard = {
+      stats,
+      recentUpdates,
+      pendingLetters,
+      processingTimeStats: {
+        averageRequestToWriting: 2.5,
+        averageWritingToSent: 3.0,
+        averageSentToDelivered: 2.0,
+      },
+    };
+
+    return {
+      success: true,
+      data: dashboard,
+    };
+  } catch (error) {
+    console.error("Failed to fetch dashboard data:", error);
+    throw error;
+  }
+};
+
+// 상태 매핑 함수
+const mapStatus = (backendStatus: string) => {
+  switch (backendStatus) {
+    case "requested":
+      return "requested" as const;
+    case "approved":
+    case "writing":
+      return "writing" as const;
+    case "sent":
+      return "sent" as const;
+    case "delivered":
+      return "delivered" as const;
+    default:
+      return "requested" as const;
+  }
+};

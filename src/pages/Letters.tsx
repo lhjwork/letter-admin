@@ -4,6 +4,8 @@ import type { LetterQueryParams } from "../types";
 import LetterTable from "../components/letters/LetterTable";
 import LetterFilter from "../components/letters/LetterFilter";
 import Pagination from "../components/common/Pagination";
+import Button from "../components/common/Button";
+import { Link } from "react-router-dom";
 import "./Letters.scss";
 
 export default function Letters() {
@@ -22,7 +24,15 @@ export default function Letters() {
 
   return (
     <div className="letters">
-      <h1 className="letters__title">편지/사연 관리</h1>
+      <div className="letters__header">
+        <h1 className="letters__title">편지/사연 관리</h1>
+
+        <div className="letters__actions">
+          <Link to="/letters/physical">
+            <Button variant="secondary">📮 실물 편지 관리</Button>
+          </Link>
+        </div>
+      </div>
 
       <LetterFilter params={params} onChange={setParams} />
 
