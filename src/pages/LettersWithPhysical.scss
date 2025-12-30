@@ -123,6 +123,12 @@
     gap: 8px;
   }
 
+  &__recipient-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
   &__no-action {
     color: #9ca3af;
     font-size: 14px;

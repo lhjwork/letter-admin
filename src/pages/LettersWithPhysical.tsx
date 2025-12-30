@@ -9,6 +9,7 @@ import Select from "../components/common/Select";
 import Input from "../components/common/Input";
 import Pagination from "../components/common/Pagination";
 import LetterPhysicalStatus from "../components/letters/LetterPhysicalStatus";
+import PhysicalLetterDetailsModal from "../components/physicalLetters/PhysicalLetterDetailsModal";
 import "./LettersWithPhysical.scss";
 
 export default function LettersWithPhysical() {
@@ -24,6 +25,15 @@ export default function LettersWithPhysical() {
   const [selectedLetters, setSelectedLetters] = useState<string[]>([]);
   const [bulkStatus, setBulkStatus] = useState<PhysicalLetterStatus>("writing");
   const [bulkNote, setBulkNote] = useState("");
+  const [detailsModal, setDetailsModal] = useState<{
+    isOpen: boolean;
+    letterId: string;
+    letterTitle: string;
+  }>({
+    isOpen: false,
+    letterId: "",
+    letterTitle: "",
+  });
 
   const { data, isLoading, error, refetch } = useLettersWithPhysicalStatus(params);
   const updateStatusMutation = useUpdateLetterPhysicalStatus();
@@ -115,6 +125,22 @@ export default function LettersWithPhysical() {
     setSelectedLetters((prev) => (prev.includes(letterId) ? prev.filter((id) => id !== letterId) : [...prev, letterId]));
   };
 
+  const openDetailsModal = (letterId: string, letterTitle: string) => {
+    setDetailsModal({
+      isOpen: true,
+      letterId,
+      letterTitle,
+    });
+  };
+
+  const closeDetailsModal = () => {
+    setDetailsModal({
+      isOpen: false,
+      letterId: "",
+      letterTitle: "",
+    });
+  };
+
   return (
     <div className="letters-with-physical">
       <div className="letters-with-physical__header">
@@ -158,6 +184,7 @@ export default function LettersWithPhysical() {
               )}
               <th>편지 제목</th>
               <th>작성자</th>
+              <th>수신자 정보</th>
               <th>신청 수</th>
               <th>현재 상태</th>
               <th>마지막 업데이트</th>
@@ -177,6 +204,13 @@ export default function LettersWithPhysical() {
                     <div className="letters-with-physical__title-cell">{letter.title}</div>
                   </td>
                   <td>{letter.authorName}</td>
+                  <td>
+                    <div className="letters-with-physical__recipient-actions">
+                      <Button size="sm" variant="secondary" onClick={() => openDetailsModal(letter._id, letter.title)}>
+                        📋 상세보기
+                      </Button>
+                    </div>
+                  </td>
                   <td>
                     <span className="letters-with-physical__count">{letter.totalRequests}개</span>
                   </td>
@@ -203,7 +237,7 @@ export default function LettersWithPhysical() {
               ))
             ) : (
               <tr>
-                <td colSpan={canWrite ? 7 : 6} className="letters-with-physical__empty">
+                <td colSpan={canWrite ? 8 : 7} className="letters-with-physical__empty">
                   실물 편지 신청이 있는 편지가 없습니다
                 </td>
               </tr>
@@ -213,6 +247,8 @@ export default function LettersWithPhysical() {
       </div>
 
       {pagination && pagination.totalPages > 1 && <Pagination page={pagination.page} totalPages={pagination.totalPages} onPageChange={(page) => setParams({ ...params, page })} />}
+
+      <PhysicalLetterDetailsModal isOpen={detailsModal.isOpen} onClose={closeDetailsModal} letterId={detailsModal.letterId} letterTitle={detailsModal.letterTitle} />
     </div>
   );
 }

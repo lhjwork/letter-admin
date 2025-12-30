@@ -13,6 +13,7 @@ import Letters from "./pages/Letters";
 import LettersWithPhysical from "./pages/LettersWithPhysical";
 import LetterDetailPage from "./pages/LetterDetail";
 import PhysicalLetters from "./pages/PhysicalLetters";
+import PhysicalLetterRequests from "./pages/PhysicalLetterRequests";
 import ChangePassword from "./pages/ChangePassword";
 
 const queryClient = new QueryClient({
@@ -76,6 +77,7 @@ function AppRoutes() {
         <Route path="letters/physical" element={<LettersWithPhysical />} />
         <Route path="letters/:id" element={<LetterDetailPage />} />
         <Route path="physical-letters" element={<PhysicalLetters />} />
+        <Route path="physical-letters/requests" element={<PhysicalLetterRequests />} />
         <Route path="change-password" element={<ChangePassword />} />
       </Route>
     </Routes>

@@ -36,6 +36,9 @@ export default function PhysicalLetters() {
           <Link to="/letters/physical">
             <Button>📮 편지별 관리</Button>
           </Link>
+          <Link to="/physical-letters/requests">
+            <Button variant="secondary">📋 신청 목록 보기</Button>
+          </Link>
         </div>
       </div>
 
