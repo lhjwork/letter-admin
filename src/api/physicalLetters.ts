@@ -1,28 +1,5 @@
 import { apiClient } from "./client";
-import type { ApiResponse, PhysicalLetterStats, PhysicalLetterDashboard, Pagination } from "../types";
-
-// 실제 백엔드 API 응답 타입 (실제 응답에 맞게 수정)
-interface PhysicalRequestResponse {
-  _id: string; // letterId 역할
-  title: string; // letterTitle 역할
-  authorName: string;
-  physicalStatus: string; // status 역할
-  physicalRequestDate: string; // requestedAt 역할
-  createdAt: string;
-  updatedAt: string;
-  recipientName: string;
-  recipientPhone: string;
-  shippingAddress: {
-    name: string;
-    phone: string;
-    zipCode: string;
-    address1: string;
-    address2: string;
-    requestedAt: string;
-  };
-  physicalNotes: string; // memo 역할
-  requestId: string;
-}
+import type { ApiResponse, PhysicalLetterStats, PhysicalLetterDashboard, Pagination, PhysicalRequestResponse } from "../types";
 
 // 실물 편지 요청 목록 조회 (기존 API 사용)
 export const getPhysicalLetterRequests = (
@@ -70,7 +47,6 @@ export const calculatePhysicalLetterStats = (requests: PhysicalRequestResponse[]
       case "requested":
         stats.requested++;
         break;
-      case "approved":
       case "writing":
         stats.writing++;
         break;
@@ -79,6 +55,10 @@ export const calculatePhysicalLetterStats = (requests: PhysicalRequestResponse[]
         break;
       case "delivered":
         stats.delivered++;
+        break;
+      default:
+        // Handle any other status as requested
+        stats.requested++;
         break;
     }
   });
@@ -152,7 +132,7 @@ export const getPhysicalLetterDashboard = async (range: string = "7d"): Promise<
         title: request.title,
         authorName: request.authorName,
         totalRequests: 1, // 개별 요청이므로 1
-        currentStatus: mapStatus(request.physicalStatus),
+        currentStatus: request.physicalStatus,
         lastUpdatedAt: request.physicalRequestDate,
         adminNote: request.physicalNotes,
         createdAt: request.physicalRequestDate,
@@ -193,22 +173,5 @@ export const getPhysicalLetterDashboard = async (range: string = "7d"): Promise<
   } catch (error) {
     console.error("Failed to fetch dashboard data:", error);
     throw error;
-  }
-};
-
-// 상태 매핑 함수
-const mapStatus = (backendStatus: string) => {
-  switch (backendStatus) {
-    case "requested":
-      return "requested" as const;
-    case "approved":
-    case "writing":
-      return "writing" as const;
-    case "sent":
-      return "sent" as const;
-    case "delivered":
-      return "delivered" as const;
-    default:
-      return "requested" as const;
   }
 };

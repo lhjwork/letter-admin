@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { useLettersWithPhysicalStatus, useUpdateLetterPhysicalStatus, useBulkUpdateLetterPhysicalStatus } from "../hooks/useLetters";
+import { useQuery } from "@tanstack/react-query";
+import { getPhysicalLetterRequests } from "../api/physicalLetters";
+import { useUpdateLetterPhysicalStatus, useBulkUpdateLetterPhysicalStatus } from "../hooks/useLetters";
 import { usePermission } from "../hooks/usePermission";
-import { PERMISSIONS, LetterQueryParams, PhysicalLetterStatus, LetterPhysicalInfo } from "../types";
+import { PERMISSIONS, LetterQueryParams, PhysicalLetterStatus, GroupedPhysicalLetter } from "../types";
 import { formatDate } from "../utils/format";
 import Loading from "../components/common/Loading";
 import Button from "../components/common/Button";
@@ -35,7 +37,18 @@ export default function LettersWithPhysical() {
     letterTitle: "",
   });
 
-  const { data, isLoading, error, refetch } = useLettersWithPhysicalStatus(params);
+  // 실제 API 사용
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["admin", "physical-requests", params],
+    queryFn: () =>
+      getPhysicalLetterRequests({
+        page: params.page,
+        limit: params.limit,
+        status: params.physicalStatus || undefined,
+        search: params.search || undefined,
+      }),
+  });
+
   const updateStatusMutation = useUpdateLetterPhysicalStatus();
   const bulkUpdateMutation = useBulkUpdateLetterPhysicalStatus();
 
@@ -63,7 +76,7 @@ export default function LettersWithPhysical() {
   const pagination = data?.pagination;
 
   // 편지별로 그룹화 (같은 _id를 가진 편지들을 하나로 합침)
-  const groupedLetters = letters.reduce((acc, letter) => {
+  const groupedLetters: GroupedPhysicalLetter[] = letters.reduce((acc, letter) => {
     const existingLetter = acc.find((item) => item._id === letter._id);
 
     if (existingLetter) {
@@ -79,7 +92,15 @@ export default function LettersWithPhysical() {
     } else {
       // 새로운 편지 항목 생성
       acc.push({
-        ...letter,
+        _id: letter._id,
+        title: letter.title,
+        authorName: letter.authorName,
+        physicalStatus: letter.physicalStatus,
+        createdAt: letter.createdAt,
+        updatedAt: letter.updatedAt,
+        currentStatus: letter.physicalStatus,
+        lastUpdatedAt: letter.physicalRequestDate,
+        adminNote: letter.physicalNotes,
         recipients: [
           {
             recipientName: letter.recipientName,
@@ -94,7 +115,7 @@ export default function LettersWithPhysical() {
     }
 
     return acc;
-  }, [] as any[]);
+  }, [] as GroupedPhysicalLetter[]);
 
   const statusOptions = [
     { value: "", label: "전체 상태" },
@@ -227,7 +248,7 @@ export default function LettersWithPhysical() {
           </thead>
           <tbody>
             {groupedLetters.length > 0 ? (
-              groupedLetters.map((letter: any) => (
+              groupedLetters.map((letter: GroupedPhysicalLetter) => (
                 <tr key={letter._id}>
                   {canWrite && (
                     <td>
@@ -247,7 +268,7 @@ export default function LettersWithPhysical() {
                         </Button>
                       </div>
                       <div className="letters-with-physical__recipient-preview">
-                        {letter.recipients.slice(0, 3).map((recipient: any, index: number) => (
+                        {letter.recipients.slice(0, 3).map((recipient) => (
                           <div key={recipient.requestId} className="letters-with-physical__recipient-item">
                             <span className="letters-with-physical__recipient-name">{recipient.recipientName}</span>
                             <span className="letters-with-physical__recipient-phone">{recipient.recipientPhone}</span>
@@ -308,39 +329,48 @@ function StatusUpdateDropdown({ currentStatus, onUpdate, loading }: StatusUpdate
   const [note, setNote] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 드롭다운 위치 조정 - 간단하고 안정적인 방식
+  // 드롭다운 위치 조정 - 더 자연스럽고 안정적인 방식
   useEffect(() => {
     if (isOpen && dropdownRef.current) {
       const dropdown = dropdownRef.current;
+      const button = dropdown.parentElement?.querySelector("button");
 
-      // 기본 absolute 포지션으로 설정
+      if (!button) return;
+
+      // 기본 포지션 설정
       dropdown.style.position = "absolute";
       dropdown.style.zIndex = "9999";
       dropdown.style.top = "100%";
       dropdown.style.right = "0";
       dropdown.style.left = "auto";
       dropdown.style.bottom = "auto";
-      dropdown.style.marginTop = "8px";
+      dropdown.style.marginTop = "4px";
       dropdown.style.marginBottom = "0";
 
-      // 다음 프레임에서 위치 조정 (화면 경계 확인)
+      // 다음 프레임에서 위치 조정
       requestAnimationFrame(() => {
         const dropdownRect = dropdown.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
         const viewportWidth = window.innerWidth;
 
         // 화면 하단을 벗어나는 경우 위쪽으로 표시
-        if (dropdownRect.bottom > viewportHeight - 30) {
+        if (dropdownRect.bottom > viewportHeight - 20) {
           dropdown.style.top = "auto";
           dropdown.style.bottom = "100%";
           dropdown.style.marginTop = "0";
-          dropdown.style.marginBottom = "8px";
+          dropdown.style.marginBottom = "4px";
         }
 
         // 화면 우측을 벗어나는 경우 왼쪽 정렬
-        if (dropdownRect.right > viewportWidth - 30) {
+        if (dropdownRect.right > viewportWidth - 20) {
           dropdown.style.right = "auto";
           dropdown.style.left = "0";
+        }
+
+        // 화면 왼쪽을 벗어나는 경우 오른쪽 정렬로 복원
+        if (dropdownRect.left < 20) {
+          dropdown.style.left = "auto";
+          dropdown.style.right = "0";
         }
       });
     }

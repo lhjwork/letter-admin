@@ -69,13 +69,9 @@
     background: white;
     border-radius: 8px;
     border: 1px solid #e5e7eb;
-    overflow: auto;
+    overflow: visible; /* 드롭다운이 보이도록 변경 */
     margin-bottom: 24px;
     position: relative;
-
-    /* 드롭다운이 컨테이너 내에서 자연스럽게 표시되도록 */
-    contain: layout;
-    min-height: 800px;
   }
 
   &__table {
@@ -91,8 +87,9 @@
       color: #374151;
       border-bottom: 1px solid #e5e7eb;
       font-size: 14px;
-      position: relative;
-      z-index: 10; /* 헤더의 z-index 설정 */
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     td {
@@ -100,11 +97,6 @@
       border-bottom: 1px solid #f3f4f6;
       vertical-align: middle;
       position: relative;
-
-      /* 액션 셀에서 드롭다운이 자연스럽게 표시되도록 */
-      &:last-child {
-        overflow: visible;
-      }
     }
 
     tr {
@@ -237,36 +229,12 @@
     padding: 16px;
     min-width: 220px;
     max-width: 280px;
-    min-height: 150px;
-    z-index: 9999; /* 매우 높은 z-index로 설정 */
+    z-index: 9999;
 
     /* 애니메이션 추가 */
     opacity: 0;
     transform: translateY(-10px);
     animation: dropdownFadeIn 0.15s ease-out forwards;
-
-    /* 기본 최대 높이 증가 */
-    max-height: 220px;
-    overflow-y: auto;
-
-    /* 스크롤바 스타일링 */
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 3px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
-      border-radius: 3px;
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-      background: #a8a8a8;
-    }
   }
 
   &__note {

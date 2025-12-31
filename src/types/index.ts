@@ -259,6 +259,57 @@ export interface LetterQueryParams {
   order?: "asc" | "desc";
 }
 
+// 실제 백엔드 API 응답 타입 (실물 편지 요청 목록)
+export interface PhysicalRequestResponse {
+  _id: string; // letterId
+  title: string;
+  authorName: string;
+  physicalStatus: PhysicalLetterStatus;
+  physicalRequestDate: string;
+  createdAt: string;
+  updatedAt: string;
+  recipientName: string;
+  recipientPhone: string;
+  shippingAddress: {
+    name: string;
+    phone: string;
+    zipCode: string;
+    address1: string;
+    address2: string;
+    requestedAt: string;
+  };
+  physicalNotes: string;
+  requestId: string;
+}
+
+// 편지별로 그룹화된 실물 편지 정보 (프론트엔드에서 사용)
+export interface GroupedPhysicalLetter {
+  _id: string; // letterId
+  title: string;
+  authorName: string;
+  physicalStatus: PhysicalLetterStatus;
+  createdAt: string;
+  updatedAt: string;
+  currentStatus: PhysicalLetterStatus;
+  lastUpdatedAt?: string;
+  adminNote?: string;
+  recipients: {
+    recipientName: string;
+    recipientPhone: string;
+    shippingAddress: {
+      name: string;
+      phone: string;
+      zipCode: string;
+      address1: string;
+      address2: string;
+      requestedAt: string;
+    };
+    physicalNotes: string;
+    requestId: string;
+    physicalRequestDate: string;
+  }[];
+}
+
 // 실물 편지 대시보드 데이터
 export interface PhysicalLetterDashboard {
   stats: PhysicalLetterStats;
