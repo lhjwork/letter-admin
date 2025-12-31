@@ -62,6 +62,40 @@ export default function LettersWithPhysical() {
   const letters = data?.data || [];
   const pagination = data?.pagination;
 
+  // 편지별로 그룹화 (같은 _id를 가진 편지들을 하나로 합침)
+  const groupedLetters = letters.reduce((acc, letter) => {
+    const existingLetter = acc.find((item) => item._id === letter._id);
+
+    if (existingLetter) {
+      // 이미 존재하는 편지에 수신자 정보 추가
+      existingLetter.recipients.push({
+        recipientName: letter.recipientName,
+        recipientPhone: letter.recipientPhone,
+        shippingAddress: letter.shippingAddress,
+        physicalNotes: letter.physicalNotes,
+        requestId: letter.requestId,
+        physicalRequestDate: letter.physicalRequestDate,
+      });
+    } else {
+      // 새로운 편지 항목 생성
+      acc.push({
+        ...letter,
+        recipients: [
+          {
+            recipientName: letter.recipientName,
+            recipientPhone: letter.recipientPhone,
+            shippingAddress: letter.shippingAddress,
+            physicalNotes: letter.physicalNotes,
+            requestId: letter.requestId,
+            physicalRequestDate: letter.physicalRequestDate,
+          },
+        ],
+      });
+    }
+
+    return acc;
+  }, [] as any[]);
+
   const statusOptions = [
     { value: "", label: "전체 상태" },
     { value: "none", label: "신청 없음" },
@@ -114,10 +148,10 @@ export default function LettersWithPhysical() {
   };
 
   const handleSelectAll = () => {
-    if (selectedLetters.length === letters.length) {
+    if (selectedLetters.length === groupedLetters.length) {
       setSelectedLetters([]);
     } else {
-      setSelectedLetters(letters.map((letter) => letter._id));
+      setSelectedLetters(groupedLetters.map((letter) => letter._id));
     }
   };
 
@@ -126,6 +160,7 @@ export default function LettersWithPhysical() {
   };
 
   const openDetailsModal = (letterId: string, letterTitle: string) => {
+    console.log("Opening details modal for:", { letterId, letterTitle });
     setDetailsModal({
       isOpen: true,
       letterId,
@@ -179,21 +214,20 @@ export default function LettersWithPhysical() {
             <tr>
               {canWrite && (
                 <th>
-                  <input type="checkbox" checked={selectedLetters.length === letters.length && letters.length > 0} onChange={handleSelectAll} />
+                  <input type="checkbox" checked={selectedLetters.length === groupedLetters.length && groupedLetters.length > 0} onChange={handleSelectAll} />
                 </th>
               )}
               <th>편지 제목</th>
               <th>작성자</th>
               <th>수신자 정보</th>
-              <th>신청 수</th>
               <th>현재 상태</th>
               <th>마지막 업데이트</th>
               {canWrite && <th>액션</th>}
             </tr>
           </thead>
           <tbody>
-            {letters.length > 0 ? (
-              letters.map((letter: LetterPhysicalInfo) => (
+            {groupedLetters.length > 0 ? (
+              groupedLetters.map((letter: any) => (
                 <tr key={letter._id}>
                   {canWrite && (
                     <td>
@@ -205,19 +239,28 @@ export default function LettersWithPhysical() {
                   </td>
                   <td>{letter.authorName}</td>
                   <td>
-                    <div className="letters-with-physical__recipient-actions">
-                      <Button size="sm" variant="secondary" onClick={() => openDetailsModal(letter._id, letter.title)}>
-                        📋 상세보기
-                      </Button>
+                    <div className="letters-with-physical__recipient-info">
+                      <div className="letters-with-physical__recipient-summary">
+                        <span className="letters-with-physical__recipient-count">{letter.recipients.length}명 신청</span>
+                        <Button size="sm" variant="secondary" onClick={() => openDetailsModal(letter._id, letter.title)}>
+                          상세보기
+                        </Button>
+                      </div>
+                      <div className="letters-with-physical__recipient-preview">
+                        {letter.recipients.slice(0, 3).map((recipient: any, index: number) => (
+                          <div key={recipient.requestId} className="letters-with-physical__recipient-item">
+                            <span className="letters-with-physical__recipient-name">{recipient.recipientName}</span>
+                            <span className="letters-with-physical__recipient-phone">{recipient.recipientPhone}</span>
+                          </div>
+                        ))}
+                        {letter.recipients.length > 3 && <div className="letters-with-physical__recipient-more">외 {letter.recipients.length - 3}명...</div>}
+                      </div>
                     </div>
-                  </td>
-                  <td>
-                    <span className="letters-with-physical__count">{letter.totalRequests}개</span>
                   </td>
                   <td>
                     <LetterPhysicalStatus
                       physicalLetter={{
-                        totalRequests: letter.totalRequests,
+                        totalRequests: letter.recipients.length,
                         currentStatus: letter.currentStatus,
                         lastUpdatedAt: letter.lastUpdatedAt,
                         adminNote: letter.adminNote,
@@ -237,7 +280,7 @@ export default function LettersWithPhysical() {
               ))
             ) : (
               <tr>
-                <td colSpan={canWrite ? 8 : 7} className="letters-with-physical__empty">
+                <td colSpan={canWrite ? 7 : 6} className="letters-with-physical__empty">
                   실물 편지 신청이 있는 편지가 없습니다
                 </td>
               </tr>
@@ -265,27 +308,41 @@ function StatusUpdateDropdown({ currentStatus, onUpdate, loading }: StatusUpdate
   const [note, setNote] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 드롭다운 위치 조정
+  // 드롭다운 위치 조정 - 간단하고 안정적인 방식
   useEffect(() => {
     if (isOpen && dropdownRef.current) {
       const dropdown = dropdownRef.current;
-      const rect = dropdown.getBoundingClientRect();
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
 
-      // 오른쪽으로 넘어가는 경우 왼쪽으로 이동
-      if (rect.right > viewportWidth) {
-        dropdown.style.right = "0";
-        dropdown.style.left = "auto";
-      }
+      // 기본 absolute 포지션으로 설정
+      dropdown.style.position = "absolute";
+      dropdown.style.zIndex = "9999";
+      dropdown.style.top = "100%";
+      dropdown.style.right = "0";
+      dropdown.style.left = "auto";
+      dropdown.style.bottom = "auto";
+      dropdown.style.marginTop = "8px";
+      dropdown.style.marginBottom = "0";
 
-      // 아래로 넘어가는 경우 위쪽으로 이동
-      if (rect.bottom > viewportHeight) {
-        dropdown.style.top = "auto";
-        dropdown.style.bottom = "100%";
-        dropdown.style.marginTop = "0";
-        dropdown.style.marginBottom = "4px";
-      }
+      // 다음 프레임에서 위치 조정 (화면 경계 확인)
+      requestAnimationFrame(() => {
+        const dropdownRect = dropdown.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
+
+        // 화면 하단을 벗어나는 경우 위쪽으로 표시
+        if (dropdownRect.bottom > viewportHeight - 30) {
+          dropdown.style.top = "auto";
+          dropdown.style.bottom = "100%";
+          dropdown.style.marginTop = "0";
+          dropdown.style.marginBottom = "8px";
+        }
+
+        // 화면 우측을 벗어나는 경우 왼쪽 정렬
+        if (dropdownRect.right > viewportWidth - 30) {
+          dropdown.style.right = "auto";
+          dropdown.style.left = "0";
+        }
+      });
     }
   }, [isOpen]);
 

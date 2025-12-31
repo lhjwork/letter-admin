@@ -1,18 +1,27 @@
 import { apiClient } from "./client";
 import type { ApiResponse, PhysicalLetterStats, PhysicalLetterDashboard, Pagination } from "../types";
 
-// 기존 백엔드 API 응답 타입
+// 실제 백엔드 API 응답 타입 (실제 응답에 맞게 수정)
 interface PhysicalRequestResponse {
-  letterId: string;
-  letterTitle: string;
+  _id: string; // letterId 역할
+  title: string; // letterTitle 역할
   authorName: string;
-  requestId: string;
+  physicalStatus: string; // status 역할
+  physicalRequestDate: string; // requestedAt 역할
+  createdAt: string;
+  updatedAt: string;
   recipientName: string;
   recipientPhone: string;
-  fullAddress: string;
-  status: string;
-  requestedAt: string;
-  memo?: string;
+  shippingAddress: {
+    name: string;
+    phone: string;
+    zipCode: string;
+    address1: string;
+    address2: string;
+    requestedAt: string;
+  };
+  physicalNotes: string; // memo 역할
+  requestId: string;
 }
 
 // 실물 편지 요청 목록 조회 (기존 API 사용)
@@ -57,7 +66,7 @@ export const calculatePhysicalLetterStats = (requests: PhysicalRequestResponse[]
   };
 
   requests.forEach((request) => {
-    switch (request.status) {
+    switch (request.physicalStatus) {
       case "requested":
         stats.requested++;
         break;
@@ -98,7 +107,7 @@ export const filterByDateRange = (requests: PhysicalRequestResponse[], range: st
       return requests;
   }
 
-  return requests.filter((request) => new Date(request.requestedAt) >= startDate);
+  return requests.filter((request) => new Date(request.physicalRequestDate) >= startDate);
 };
 
 // 실물 편지 통계 조회 (기존 API 기반)
@@ -136,34 +145,34 @@ export const getPhysicalLetterDashboard = async (range: string = "7d"): Promise<
 
     // 최근 업데이트 (최근 10개)
     const recentUpdates = filteredRequests
-      .sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime())
+      .sort((a, b) => new Date(b.physicalRequestDate).getTime() - new Date(a.physicalRequestDate).getTime())
       .slice(0, 10)
       .map((request) => ({
         _id: request.requestId,
-        title: request.letterTitle,
+        title: request.title,
         authorName: request.authorName,
         totalRequests: 1, // 개별 요청이므로 1
-        currentStatus: mapStatus(request.status),
-        lastUpdatedAt: request.requestedAt,
-        adminNote: request.memo,
-        createdAt: request.requestedAt,
-        updatedAt: request.requestedAt,
+        currentStatus: mapStatus(request.physicalStatus),
+        lastUpdatedAt: request.physicalRequestDate,
+        adminNote: request.physicalNotes,
+        createdAt: request.physicalRequestDate,
+        updatedAt: request.physicalRequestDate,
       }));
 
     // 대기 중인 편지 (requested 상태)
     const pendingLetters = filteredRequests
-      .filter((request) => request.status === "requested")
+      .filter((request) => request.physicalStatus === "requested")
       .slice(0, 10)
       .map((request) => ({
         _id: request.requestId,
-        title: request.letterTitle,
+        title: request.title,
         authorName: request.authorName,
         totalRequests: 1,
         currentStatus: "requested" as const,
-        lastUpdatedAt: request.requestedAt,
-        adminNote: request.memo,
-        createdAt: request.requestedAt,
-        updatedAt: request.requestedAt,
+        lastUpdatedAt: request.physicalRequestDate,
+        adminNote: request.physicalNotes,
+        createdAt: request.physicalRequestDate,
+        updatedAt: request.physicalRequestDate,
       }));
 
     const dashboard: PhysicalLetterDashboard = {

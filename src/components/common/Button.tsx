@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import "./Button.scss";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -6,10 +7,14 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
 }
 
-export default function Button({ children, variant = "primary", size = "md", loading = false, disabled, className = "", ...props }: ButtonProps) {
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(({ children, variant = "primary", size = "md", loading = false, disabled, className = "", ...props }, ref) => {
   return (
-    <button className={`btn btn--${variant} btn--${size} ${className}`} disabled={disabled || loading} {...props}>
+    <button ref={ref} className={`btn btn--${variant} btn--${size} ${className}`} disabled={disabled || loading} {...props}>
       {loading ? <span className="btn__spinner" /> : children}
     </button>
   );
-}
+});
+
+Button.displayName = "Button";
+
+export default Button;

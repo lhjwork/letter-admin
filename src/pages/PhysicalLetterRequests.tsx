@@ -22,6 +22,14 @@ export default function PhysicalLetterRequests() {
 
   const { data, isLoading, error, refetch } = usePhysicalLetterRequests(params);
 
+  // 디버깅을 위한 로그 추가
+  console.log("PhysicalLetterRequests data:", {
+    data: data?.data,
+    total: data?.data?.length,
+    pagination: data?.pagination,
+    params,
+  });
+
   const canRead = hasPermission(PERMISSIONS.LETTERS_READ);
 
   if (!canRead) {
@@ -109,7 +117,7 @@ export default function PhysicalLetterRequests() {
                 <tr key={request.requestId}>
                   <td>
                     <div className="physical-letter-requests__letter-info">
-                      <div className="physical-letter-requests__letter-title">{request.letterTitle}</div>
+                      <div className="physical-letter-requests__letter-title">{request.title}</div>
                       <div className="physical-letter-requests__letter-author">작성자: {request.authorName}</div>
                     </div>
                   </td>
@@ -120,16 +128,21 @@ export default function PhysicalLetterRequests() {
                     </div>
                   </td>
                   <td>
-                    <div className="physical-letter-requests__address">{request.fullAddress}</div>
+                    <div className="physical-letter-requests__address">
+                      {request.shippingAddress.address1} {request.shippingAddress.address2}
+                      <br />({request.shippingAddress.zipCode})
+                    </div>
                   </td>
                   <td>
-                    <span className={`physical-letter-requests__status-badge physical-letter-requests__status-badge--${getStatusClass(request.status)}`}>{getStatusLabel(request.status)}</span>
+                    <span className={`physical-letter-requests__status-badge physical-letter-requests__status-badge--${getStatusClass(request.physicalStatus)}`}>
+                      {getStatusLabel(request.physicalStatus)}
+                    </span>
                   </td>
                   <td>
-                    <div className="physical-letter-requests__date">{formatDate(request.requestedAt)}</div>
+                    <div className="physical-letter-requests__date">{formatDate(request.physicalRequestDate)}</div>
                   </td>
                   <td>
-                    <div className="physical-letter-requests__memo">{request.memo || "-"}</div>
+                    <div className="physical-letter-requests__memo">{request.physicalNotes || "-"}</div>
                   </td>
                 </tr>
               ))

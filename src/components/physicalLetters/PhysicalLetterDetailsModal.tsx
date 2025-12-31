@@ -13,15 +13,33 @@ interface PhysicalLetterDetailsModalProps {
 }
 
 export default function PhysicalLetterDetailsModal({ isOpen, onClose, letterId, letterTitle }: PhysicalLetterDetailsModalProps) {
+  // letterId를 사용하여 더 정확한 검색
   const searchParams = {
-    search: letterTitle, // Search by letter title to find related requests
-    limit: 100, // Get all requests for this letter
+    limit: 1000, // 모든 요청을 가져와서 클라이언트에서 필터링
   };
 
   const { data, isLoading, error } = usePhysicalLetterRequests(searchParams);
 
-  // Filter requests that match this letter
-  const letterRequests = data?.data?.filter((request) => request.letterId === letterId || request.letterTitle === letterTitle) || [];
+  // Filter requests that match this letter - _id로 정확히 매칭
+  const letterRequests =
+    data?.data?.filter((request) => {
+      console.log("Filtering request:", {
+        requestId: request._id,
+        targetLetterId: letterId,
+        requestTitle: request.title,
+        targetTitle: letterTitle,
+        match: request._id === letterId,
+      });
+      return request._id === letterId;
+    }) || [];
+
+  console.log("Modal data:", {
+    letterId,
+    letterTitle,
+    totalRequests: data?.data?.length || 0,
+    matchedRequests: letterRequests.length,
+    allRequests: data?.data?.map((r) => ({ id: r._id, title: r.title })) || [],
+  });
 
   useEffect(() => {
     if (isOpen) {
@@ -86,11 +104,11 @@ export default function PhysicalLetterDetailsModal({ isOpen, onClose, letterId, 
                 <div key={request.requestId} className="physical-letter-details-modal__request-card">
                   <div className="physical-letter-details-modal__request-header">
                     <div className="physical-letter-details-modal__request-status">
-                      <span className={`physical-letter-details-modal__status-badge physical-letter-details-modal__status-badge--${getStatusClass(request.status)}`}>
-                        {getStatusLabel(request.status)}
+                      <span className={`physical-letter-details-modal__status-badge physical-letter-details-modal__status-badge--${getStatusClass(request.physicalStatus)}`}>
+                        {getStatusLabel(request.physicalStatus)}
                       </span>
                     </div>
-                    <div className="physical-letter-details-modal__request-date">{formatDate(request.requestedAt)}</div>
+                    <div className="physical-letter-details-modal__request-date">{formatDate(request.physicalRequestDate)}</div>
                   </div>
 
                   <div className="physical-letter-details-modal__request-details">
@@ -106,13 +124,16 @@ export default function PhysicalLetterDetailsModal({ isOpen, onClose, letterId, 
 
                     <div className="physical-letter-details-modal__detail-section">
                       <h4>배송 주소</h4>
-                      <div className="physical-letter-details-modal__address">{request.fullAddress}</div>
+                      <div className="physical-letter-details-modal__address">
+                        {request.shippingAddress.address1} {request.shippingAddress.address2}
+                        <br />({request.shippingAddress.zipCode})
+                      </div>
                     </div>
 
-                    {request.memo && (
+                    {request.physicalNotes && (
                       <div className="physical-letter-details-modal__detail-section">
                         <h4>메모</h4>
-                        <div className="physical-letter-details-modal__memo">{request.memo}</div>
+                        <div className="physical-letter-details-modal__memo">{request.physicalNotes}</div>
                       </div>
                     )}
                   </div>
