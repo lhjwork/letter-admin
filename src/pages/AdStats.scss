@@ -1,0 +1,170 @@
+.ad-stats {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+
+  &__title {
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  &__subtitle {
+    color: #6b7280;
+    margin-top: 4px;
+  }
+
+  &__date-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__date-btn {
+    padding: 6px 12px;
+    font-size: 14px;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #e5e7eb;
+    }
+  }
+
+  &__empty {
+    padding: 40px;
+    text-align: center;
+    color: #6b7280;
+  }
+
+  &__summary {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  &__card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__card-label {
+    font-size: 14px;
+    color: #6b7280;
+  }
+
+  &__card-value {
+    font-size: 24px;
+    font-weight: 700;
+
+    &--blue {
+      color: #3b82f6;
+    }
+
+    &--green {
+      color: #10b981;
+    }
+  }
+
+  &__charts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  &__chart {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+
+    &--full {
+      grid-column: span 2;
+    }
+  }
+
+  &__chart-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  &__qr {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  &__qr-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  &__qr-content {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+  }
+
+  &__qr-code {
+    padding: 16px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+  }
+
+  &__qr-info {
+    flex: 1;
+
+    h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+  }
+
+  &__qr-url {
+    background: #f3f4f6;
+    padding: 12px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 13px;
+    word-break: break-all;
+    margin-bottom: 12px;
+  }
+
+  &__qr-desc {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .ad-stats {
+    &__summary {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    &__charts {
+      grid-template-columns: 1fr;
+    }
+
+    &__chart--full {
+      grid-column: span 1;
+    }
+  }
+}

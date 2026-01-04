@@ -15,6 +15,10 @@ import LetterDetailPage from "./pages/LetterDetail";
 import PhysicalLetters from "./pages/PhysicalLetters";
 import PhysicalLetterRequests from "./pages/PhysicalLetterRequests";
 import ChangePassword from "./pages/ChangePassword";
+import Ads from "./pages/Ads";
+import AdNew from "./pages/AdNew";
+import AdDetail from "./pages/AdDetail";
+import AdStats from "./pages/AdStats";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,6 +83,10 @@ function AppRoutes() {
         <Route path="physical-letters" element={<PhysicalLetters />} />
         <Route path="physical-letters/requests" element={<PhysicalLetterRequests />} />
         <Route path="change-password" element={<ChangePassword />} />
+        <Route path="ads" element={<Ads />} />
+        <Route path="ads/new" element={<AdNew />} />
+        <Route path="ads/:id" element={<AdDetail />} />
+        <Route path="ads/:id/stats" element={<AdStats />} />
       </Route>
     </Routes>
   );

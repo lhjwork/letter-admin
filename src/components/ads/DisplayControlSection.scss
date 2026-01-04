@@ -1,0 +1,249 @@
+.display-control {
+  &__section {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+
+    @media (max-width: 768px) {
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 6px;
+    }
+  }
+
+  &__section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+
+    @media (max-width: 768px) {
+      font-size: 14px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+    }
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (max-width: 768px) {
+      gap: 12px;
+    }
+  }
+
+  &__field {
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #374151;
+
+      @media (max-width: 768px) {
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+    }
+  }
+
+  &__field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
+
+  &__checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f9fafb;
+    }
+
+    @media (max-width: 768px) {
+      padding: 6px;
+    }
+
+    input[type="checkbox"] {
+      margin-top: 2px;
+    }
+
+    span {
+      font-weight: 500;
+
+      @media (max-width: 768px) {
+        font-size: 13px;
+      }
+    }
+  }
+
+  &__help {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+
+    @media (max-width: 768px) {
+      font-size: 11px;
+    }
+  }
+
+  &__placements {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+  }
+
+  &__placement {
+    .display-control__checkbox {
+      align-items: flex-start;
+    }
+  }
+
+  &__placement-label {
+    font-weight: 500;
+    display: block;
+
+    @media (max-width: 768px) {
+      font-size: 13px;
+    }
+  }
+
+  &__placement-desc {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+
+    @media (max-width: 768px) {
+      font-size: 11px;
+    }
+  }
+
+  &__age-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    @media (max-width: 480px) {
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    input {
+      width: 80px;
+
+      @media (max-width: 480px) {
+        width: 70px;
+      }
+    }
+
+    span {
+      color: #6b7280;
+      font-size: 14px;
+
+      @media (max-width: 768px) {
+        font-size: 13px;
+      }
+    }
+  }
+
+  &__time-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+    }
+
+    input {
+      width: 120px;
+
+      @media (max-width: 480px) {
+        width: 100%;
+      }
+    }
+
+    span {
+      color: #6b7280;
+
+      @media (max-width: 480px) {
+        text-align: center;
+      }
+    }
+  }
+
+  &__days {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      gap: 8px;
+    }
+  }
+
+  &__day {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f3f4f6;
+    }
+
+    @media (max-width: 768px) {
+      padding: 3px 6px;
+    }
+
+    span {
+      font-size: 14px;
+
+      @media (max-width: 768px) {
+        font-size: 13px;
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+
+    @media (max-width: 768px) {
+      margin-top: 16px;
+    }
+
+    @media (max-width: 480px) {
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

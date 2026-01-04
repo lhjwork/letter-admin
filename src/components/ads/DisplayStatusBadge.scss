@@ -1,0 +1,32 @@
+.display-status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+
+  &--green {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  &--blue {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  &--yellow {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  &--red {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  &--gray {
+    background: #f3f4f6;
+    color: #374151;
+  }
+}

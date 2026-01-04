@@ -37,6 +37,12 @@ export default function Sidebar() {
       icon: "📮",
       show: hasPermission(PERMISSIONS.LETTERS_READ),
     },
+    {
+      path: "/ads",
+      label: "광고 관리",
+      icon: "📢",
+      show: hasPermission(PERMISSIONS.LETTERS_READ),
+    },
   ];
 
   return (
