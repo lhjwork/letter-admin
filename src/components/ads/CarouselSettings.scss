@@ -1,0 +1,299 @@
+.carousel-settings {
+  &__section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__section-title {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__field {
+    margin-bottom: 1rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #495057;
+    }
+  }
+
+  &__field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    cursor: pointer;
+
+    input[type="checkbox"] {
+      margin: 0;
+      margin-top: 0.125rem;
+    }
+
+    span {
+      font-weight: 500;
+      color: #495057;
+    }
+  }
+
+  &__help {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.875rem;
+    color: #6c757d;
+    line-height: 1.4;
+  }
+
+  // 미리보기 토글 버튼
+  &__preview-toggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  &__preview-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #dee2e6;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #f8f9fa;
+      border-color: #adb5bd;
+    }
+
+    &.active {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+  }
+
+  // 이미지 업로드 및 미리보기
+  &__image-upload {
+    .carousel-settings__field {
+      margin-bottom: 1rem;
+    }
+  }
+
+  &__image-preview {
+    margin-top: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #dee2e6;
+
+    &--mobile {
+      max-width: 300px;
+    }
+  }
+
+  &__preview-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 300px;
+    object-fit: cover;
+  }
+
+  // 색상 입력
+  &__color-input {
+    width: 60px;
+    height: 40px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 0;
+    background: none;
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    &::-webkit-color-swatch {
+      border: none;
+      border-radius: 4px;
+    }
+  }
+
+  // 노출 위치 체크박스
+  &__placements {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__placement {
+    .carousel-settings__checkbox {
+      align-items: flex-start;
+      
+      div {
+        flex: 1;
+      }
+    }
+  }
+
+  &__placement-label {
+    font-weight: 500;
+    color: #495057;
+    display: block;
+  }
+
+  &__placement-desc {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.875rem;
+    color: #6c757d;
+  }
+
+  // 캐러셀 미리보기
+  &__preview {
+    margin-top: 1rem;
+  }
+
+  &__preview-container {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-width: 600px;
+  }
+
+  &__preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
+    z-index: 1;
+  }
+
+  &__preview-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2rem;
+    z-index: 2;
+
+    h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    p {
+      margin: 0 0 1rem 0;
+      font-size: 1rem;
+      line-height: 1.4;
+      opacity: 0.9;
+    }
+  }
+
+  &__preview-cta {
+    padding: 0.75rem 1.5rem;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: #0056b3;
+    }
+  }
+
+  &__preview-info {
+    margin: 0.75rem 0 0 0;
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-align: center;
+  }
+
+  // 반응형 디자인
+  @media (max-width: 768px) {
+    &__section {
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    &__section-title {
+      font-size: 1rem;
+    }
+
+    &__preview-toggle {
+      flex-direction: column;
+    }
+
+    &__preview-btn {
+      text-align: center;
+    }
+
+    &__preview-content {
+      padding: 1.5rem;
+
+      h4 {
+        font-size: 1.25rem;
+      }
+
+      p {
+        font-size: 0.875rem;
+      }
+    }
+
+    &__preview-cta {
+      padding: 0.625rem 1.25rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    &__section {
+      padding: 0.75rem;
+    }
+
+    &__field-row {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    &__preview-content {
+      padding: 1rem;
+
+      h4 {
+        font-size: 1.125rem;
+      }
+    }
+  }
+}

@@ -94,3 +94,18 @@ export const useDisplayableAds = (params?: { placement?: string; limit?: number;
     queryFn: () => adsApi.getDisplayableAds(params),
   });
 };
+
+export const useCarouselAds = (params?: { 
+  placement?: "home" | "stories" | "letters"; 
+  limit?: number; 
+  aspectRatio?: "16:9" | "21:9" | "4:3";
+  deviceType?: "mobile" | "tablet" | "desktop";
+  autoPlay?: boolean;
+}) => {
+  return useQuery({
+    queryKey: ["admin", "ads", "carousel", params],
+    queryFn: () => adsApi.getCarouselAds(params),
+    staleTime: 5 * 60 * 1000, // 5분
+    refetchInterval: 10 * 60 * 1000, // 10분마다 자동 갱신
+  });
+};

@@ -12,6 +12,7 @@ import Loading from "../components/common/Loading";
 import Modal from "../components/common/Modal";
 import DisplayControlSection from "../components/ads/DisplayControlSection";
 import DisplayPreview from "../components/ads/DisplayPreview";
+import CarouselSettings from "../components/ads/CarouselSettings";
 import "./AdDetail.scss";
 
 export default function AdDetail() {
@@ -31,6 +32,7 @@ export default function AdDetail() {
     { id: "basic", label: "기본 정보", icon: "📝" },
     { id: "content", label: "콘텐츠", icon: "🎨" },
     { id: "campaign", label: "캠페인", icon: "📅" },
+    { id: "carousel", label: "캐러셀", icon: "🎠" },
     { id: "display", label: "노출 제어", icon: "⚙️" },
   ];
 
@@ -351,7 +353,7 @@ export default function AdDetail() {
                             value={formData.content?.headline || ""}
                             onChange={(e) => setFormData({
                               ...formData,
-                              content: { ...formData.content, headline: e.target.value },
+                              content: { ...formData.content, headline: e.target.value }
                             })}
                             placeholder="광고 제목을 입력하세요"
                             required
@@ -515,6 +517,20 @@ export default function AdDetail() {
                           />
                         </div>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "carousel" && (
+                  <div className="ad-detail__form-content">
+                    <div className="ad-detail__section">
+                      <h3 className="ad-detail__section-title">캐러셀 광고 설정</h3>
+                      <CarouselSettings
+                        content={formData.content || {}}
+                        displayControl={formData.displayControl || {}}
+                        onContentChange={(content) => setFormData({ ...formData, content: { ...formData.content, ...content } })}
+                        onDisplayControlChange={(displayControl) => setFormData({ ...formData, displayControl: { ...formData.displayControl, ...displayControl } })}
+                      />
                     </div>
                   </div>
                 )}

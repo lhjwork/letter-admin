@@ -47,3 +47,19 @@ export const getDisplayableAds = (params?: { placement?: string; limit?: number;
   if (params?.theme) searchParams.theme = params.theme;
   return apiClient.get("ads/displayable", { searchParams }).json<ApiResponse<Ad[]>>();
 };
+
+export const getCarouselAds = (params?: { 
+  placement?: "home" | "stories" | "letters"; 
+  limit?: number; 
+  aspectRatio?: "16:9" | "21:9" | "4:3";
+  deviceType?: "mobile" | "tablet" | "desktop";
+  autoPlay?: boolean;
+}) => {
+  const searchParams: Record<string, string> = {};
+  if (params?.placement) searchParams.placement = params.placement;
+  if (params?.limit) searchParams.limit = params.limit.toString();
+  if (params?.aspectRatio) searchParams.aspectRatio = params.aspectRatio;
+  if (params?.deviceType) searchParams.deviceType = params.deviceType;
+  if (params?.autoPlay !== undefined) searchParams.autoPlay = params.autoPlay.toString();
+  return apiClient.get("ads/carousel", { searchParams }).json<ApiResponse<Ad[]>>();
+};

@@ -6,6 +6,7 @@ import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import Textarea from "../components/common/Textarea";
 import Select from "../components/common/Select";
+import CarouselSettings from "../components/ads/CarouselSettings";
 import "./AdNew.scss";
 
 export default function AdNew() {
@@ -335,6 +336,26 @@ export default function AdNew() {
               />
             </div>
           </div>
+        </section>
+
+        <section className="ad-new__section">
+          <h2 className="ad-new__section-title">캐러셀 설정</h2>
+          <CarouselSettings
+            content={formData.content}
+            displayControl={formData.displayControl || {}}
+            onContentChange={(content) => setFormData({ ...formData, content: { ...formData.content, ...content } })}
+            onDisplayControlChange={(displayControl) => setFormData({ 
+              ...formData, 
+              displayControl: { 
+                isVisible: true,
+                placements: ["landing"],
+                priority: 0,
+                targetAudience: { gender: "all" },
+                ...formData.displayControl, 
+                ...displayControl 
+              } 
+            })}
+          />
         </section>
 
         <section className="ad-new__section">

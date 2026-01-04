@@ -105,6 +105,47 @@ export default function AdStats() {
         </div>
       </div>
 
+      {/* 캐러셀 통계 섹션 (캐러셀 광고인 경우에만 표시) */}
+      {stats.summary.carouselImpressions !== undefined && (
+        <div className="ad-stats__carousel-section">
+          <h3 className="ad-stats__section-title">🎠 캐러셀 통계</h3>
+          <div className="ad-stats__summary">
+            <div className="ad-stats__card">
+              <span className="ad-stats__card-label">캐러셀 노출수</span>
+              <span className="ad-stats__card-value">{(stats.summary.carouselImpressions || 0).toLocaleString()}</span>
+            </div>
+            <div className="ad-stats__card">
+              <span className="ad-stats__card-label">캐러셀 클릭수</span>
+              <span className="ad-stats__card-value ad-stats__card-value--blue">
+                {(stats.summary.carouselClicks || 0).toLocaleString()}
+              </span>
+            </div>
+            <div className="ad-stats__card">
+              <span className="ad-stats__card-label">캐러셀 CTR</span>
+              <span className="ad-stats__card-value ad-stats__card-value--green">
+                {stats.summary.carouselCtr ? `${stats.summary.carouselCtr}%` : '0%'}
+              </span>
+            </div>
+            <div className="ad-stats__card">
+              <span className="ad-stats__card-label">평균 시청시간</span>
+              <span className="ad-stats__card-value">
+                {stats.summary.carouselAvgViewTime ? `${stats.summary.carouselAvgViewTime}초` : '0초'}
+              </span>
+            </div>
+            <div className="ad-stats__card">
+              <span className="ad-stats__card-label">슬라이드 변경</span>
+              <span className="ad-stats__card-value">{(stats.summary.carouselSlideChanges || 0).toLocaleString()}</span>
+            </div>
+            <div className="ad-stats__card">
+              <span className="ad-stats__card-label">자동재생 중단</span>
+              <span className="ad-stats__card-value ad-stats__card-value--orange">
+                {(stats.summary.carouselAutoPlayStops || 0).toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="ad-stats__charts">
         <div className="ad-stats__chart ad-stats__chart--full">
           <h3 className="ad-stats__chart-title">일별 추이</h3>
