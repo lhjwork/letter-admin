@@ -1,7 +1,7 @@
 import ky from "ky";
 import { useAuthStore } from "../stores/authStore";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 export const apiClient = ky.create({
   prefixUrl: API_BASE_URL,
@@ -18,7 +18,7 @@ export const apiClient = ky.create({
       async (_request, _options, response) => {
         if (response.status === 401) {
           useAuthStore.getState().logout();
-          window.location.href = "/login";
+          window.location.href = `${import.meta.env.BASE_URL}login`;
         }
         return response;
       },
