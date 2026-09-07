@@ -403,6 +403,7 @@ export default function AdDetail() {
                           <label>타겟 URL *</label>
                           <Input
                             type="url"
+                            pattern="https?://.*"
                             value={formData.content?.targetUrl || ""}
                             onChange={(e) => setFormData({
                               ...formData,

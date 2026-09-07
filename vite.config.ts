@@ -8,6 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   base: "/admin/",
   plugins: [react()],
+  esbuild: { drop: ["console", "debugger"] },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

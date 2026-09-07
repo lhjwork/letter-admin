@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 import type { Admin, Permission, AdminRole } from "../types";
 import { ROLE_PERMISSIONS } from "../types";
 
@@ -50,6 +50,8 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "admin-auth",
+      // 탭 닫으면 토큰 소멸. 장기적으로는 HttpOnly 쿠키로
+      storage: createJSONStorage(() => sessionStorage),
     }
   )
 );
