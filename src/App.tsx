@@ -14,6 +14,7 @@ import LettersWithPhysical from "./pages/LettersWithPhysical";
 import LetterDetailPage from "./pages/LetterDetail";
 import PhysicalLetters from "./pages/PhysicalLetters";
 import PhysicalLetterRequests from "./pages/PhysicalLetterRequests";
+import DiaryRequests from "./pages/DiaryRequests";
 import ChangePassword from "./pages/ChangePassword";
 import Ads from "./pages/Ads";
 import AdNew from "./pages/AdNew";
@@ -82,6 +83,7 @@ function AppRoutes() {
         <Route path="letters/:id" element={<LetterDetailPage />} />
         <Route path="physical-letters" element={<PhysicalLetters />} />
         <Route path="physical-letters/requests" element={<PhysicalLetterRequests />} />
+        <Route path="diaries/requests" element={<DiaryRequests />} />
         <Route path="change-password" element={<ChangePassword />} />
         <Route path="ads" element={<Ads />} />
         <Route path="ads/new" element={<AdNew />} />

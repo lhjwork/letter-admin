@@ -38,6 +38,12 @@ export default function Sidebar() {
       show: hasPermission(PERMISSIONS.LETTERS_READ),
     },
     {
+      path: "/diaries/requests",
+      label: "다이어리 제본 신청",
+      icon: "📔",
+      show: hasPermission(PERMISSIONS.LETTERS_READ),
+    },
+    {
       path: "/ads",
       label: "광고 관리",
       icon: "📢",
