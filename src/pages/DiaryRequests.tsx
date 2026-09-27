@@ -6,7 +6,7 @@ import { formatDate } from "../utils/format";
 import Loading from "../components/common/Loading";
 import Button from "../components/common/Button";
 import Select from "../components/common/Select";
-import { DIARY_STATUS_LABEL, getDiaryPhysicalRequests, updateDiaryPhysical, type DiaryPhysicalRequest, type DiaryPhysicalStatus } from "../api/diaries";
+import { DIARY_STATUS_LABEL, getDiaryPhysicalRequests, getDiaryPrintLink, updateDiaryPhysical, type DiaryPhysicalRequest, type DiaryPhysicalStatus } from "../api/diaries";
 import "./PhysicalLetterRequests.scss";
 
 const COMMUNITY_URL = import.meta.env.VITE_COMMUNITY_URL || "https://letter.seoul.kr";
@@ -85,8 +85,24 @@ function Row({ r, u, canWrite, saving, onSave }: { r: DiaryPhysicalRequest; u: {
         <div className="physical-letter-requests__letter-info">
           <div className="physical-letter-requests__letter-title">{r.title}</div>
           <div className="physical-letter-requests__letter-author">{r.month} · {r.paper} · {r.font}</div>
-          {/* 인쇄본: 관리자가 로그인된 커뮤니티 세션으로 열어야 함 (소유자 확인) — 사용자 계정 대신 관리자 열람 API는 Phase 3 */}
-          <a href={`${COMMUNITY_URL}/diary/${r._id}/print`} target="_blank" rel="noreferrer" style={{ fontSize: 12 }}>인쇄 뷰 열기 ↗</a>
+          <button
+            type="button"
+            style={{ fontSize: 12, color: "#2563eb", background: "none", border: 0, padding: 0, cursor: "pointer" }}
+            onClick={async () => {
+              const w = window.open("", "_blank"); // 팝업 차단 회피: 클릭 직후 창을 먼저 연다
+              try {
+                const { data } = await getDiaryPrintLink(r._id);
+                const url = `${COMMUNITY_URL}/diary/${r._id}/print?t=${encodeURIComponent(data.token)}`;
+                if (w) w.location.href = url;
+                else window.open(url, "_blank");
+              } catch {
+                w?.close();
+                alert("인쇄 링크를 만들지 못했습니다.");
+              }
+            }}
+          >
+            인쇄 뷰 열기 ↗ (15분 링크)
+          </button>
         </div>
       </td>
       <td>

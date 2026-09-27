@@ -36,3 +36,6 @@ export const getDiaryPhysicalRequests = (status?: string) =>
 
 export const updateDiaryPhysical = (diaryId: string, data: { status?: DiaryPhysicalStatus; notes?: string }) =>
   apiClient.patch(`admin/diaries/${diaryId}/physical`, { json: data }).json<ApiResponse<DiaryPhysicalRequest["physical"]>>();
+
+/** 커뮤니티 인쇄 뷰를 소유자 세션 없이 열기 위한 15분 토큰 */
+export const getDiaryPrintLink = (diaryId: string) => apiClient.post(`admin/diaries/${diaryId}/print-link`).json<ApiResponse<{ token: string; expiresIn: number }>>();
