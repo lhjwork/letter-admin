@@ -51,7 +51,7 @@ export interface Address {
   zipCode: string;
   address: string;
   addressDetail?: string;
-  phone: string;
+  phone?: string;
   isDefault: boolean;
 }
 

@@ -45,7 +45,7 @@ export default function UserDetail({ user }: UserDetailProps) {
                   {addr.isDefault && <span className="address-card__default">기본</span>}
                 </div>
                 <p className="address-card__recipient">
-                  {addr.recipientName} / {addr.phone}
+                  {addr.recipientName} / {addr.phone || "연락처 없음"}
                 </p>
                 <p className="address-card__address">
                   [{addr.zipCode}] {addr.address} {addr.addressDetail}
