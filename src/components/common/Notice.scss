@@ -1,0 +1,42 @@
+@use "../../styles/variables" as *;
+
+.notice-stack {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  max-width: calc(100% - 32px);
+}
+
+.notice {
+  padding: 12px 20px;
+  border-radius: $radius-lg;
+  background: $gray-900;
+  color: white;
+  font-size: 0.9375rem;
+  box-shadow: $shadow-lg;
+  white-space: pre-line;
+
+  &--error {
+    background: $danger-dark;
+  }
+}
+
+.notice-confirm__text {
+  margin: 0 0 1.25rem;
+  color: $gray-700;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.notice-confirm__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

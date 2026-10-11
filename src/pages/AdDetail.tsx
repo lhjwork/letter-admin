@@ -14,6 +14,7 @@ import DisplayControlSection from "../components/ads/DisplayControlSection";
 import DisplayPreview from "../components/ads/DisplayPreview";
 import CarouselSettings from "../components/ads/CarouselSettings";
 import "./AdDetail.scss";
+import { notify, askConfirm } from "../components/common/Notice";
 
 export default function AdDetail() {
   const { id } = useParams<{ id: string }>();
@@ -59,10 +60,10 @@ export default function AdDetail() {
     setIsSaving(true);
     try {
       await updateAd.mutateAsync({ id, data: formData });
-      alert("광고가 수정되었습니다.");
+      notify("광고가 수정되었습니다.");
     } catch (error) {
       console.error("Update ad error:", error);
-      alert("광고 수정에 실패했습니다.");
+      notify("광고 수정에 실패했습니다.", "error");
     } finally {
       setIsSaving(false);
     }
@@ -73,25 +74,25 @@ export default function AdDetail() {
     
     try {
       await deleteAd.mutateAsync(id);
-      alert("광고가 삭제되었습니다.");
+      notify("광고가 삭제되었습니다.");
       navigate("/ads");
     } catch (error) {
       console.error("Delete ad error:", error);
-      alert("광고 삭제에 실패했습니다.");
+      notify("광고 삭제에 실패했습니다.", "error");
     }
   };
 
   const handleUnlinkLetter = async (letterId: string) => {
     if (!id) return;
-    if (!confirm("편지 연결을 해제하시겠습니까?")) return;
+    if (!(await askConfirm("편지 연결을 해제하시겠습니까?"))) return;
     
     try {
       await unlinkLetter.mutateAsync({ adId: id, letterId });
       refetch();
-      alert("편지 연결이 해제되었습니다.");
+      notify("편지 연결이 해제되었습니다.");
     } catch (error) {
       console.error("Unlink letter error:", error);
-      alert("편지 연결 해제에 실패했습니다.");
+      notify("편지 연결 해제에 실패했습니다.", "error");
     }
   };
 
@@ -103,7 +104,7 @@ export default function AdDetail() {
     if (!data?.data?.slug) return;
     const qrUrl = generateAdQRUrl(data.data.slug, APP_URL);
     navigator.clipboard.writeText(qrUrl);
-    alert("QR URL이 클립보드에 복사되었습니다.");
+    notify("QR URL이 클립보드에 복사되었습니다.");
   };
 
   const handleQuickStatusChange = async (newStatus: AdStatus) => {
@@ -112,10 +113,10 @@ export default function AdDetail() {
     try {
       await updateAd.mutateAsync({ id, data: { status: newStatus } });
       setFormData({ ...formData, status: newStatus });
-      alert(`광고 상태가 "${newStatus === 'active' ? '활성' : '비활성'}"으로 변경되었습니다.`);
+      notify(`광고 상태가 "${newStatus === 'active' ? '활성' : '비활성'}"으로 변경되었습니다.`);
     } catch (error) {
       console.error("Status update error:", error);
-      alert("상태 변경에 실패했습니다.");
+      notify("상태 변경에 실패했습니다.", "error");
     }
   };
 

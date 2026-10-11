@@ -5,6 +5,7 @@ import Button from "../common/Button";
 import Input from "../common/Input";
 import Select from "../common/Select";
 import "./DisplayControlSection.scss";
+import { notify } from "../common/Notice";
 
 interface DisplayControlSectionProps {
   ad: any;
@@ -46,10 +47,10 @@ export default function DisplayControlSection({ ad, onUpdate }: DisplayControlSe
     try {
       await updateDisplayControl.mutateAsync({ adId: ad._id, displayControl: formData });
       onUpdate(formData);
-      alert("노출 설정이 업데이트되었습니다.");
+      notify("노출 설정이 업데이트되었습니다.");
     } catch (error) {
       console.error("Display control update error:", error);
-      alert("노출 설정 업데이트에 실패했습니다.");
+      notify("노출 설정 업데이트에 실패했습니다.", "error");
     }
   };
 

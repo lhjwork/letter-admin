@@ -8,6 +8,7 @@ import Textarea from "../components/common/Textarea";
 import Select from "../components/common/Select";
 import CarouselSettings from "../components/ads/CarouselSettings";
 import "./AdNew.scss";
+import { notify } from "../components/common/Notice";
 
 export default function AdNew() {
   const navigate = useNavigate();
@@ -64,11 +65,11 @@ export default function AdNew() {
       };
       
       const result = await createAd.mutateAsync(processedData);
-      alert("광고가 생성되고 활성화되었습니다!");
+      notify("광고가 생성되고 활성화되었습니다!");
       navigate(`/ads/${result.data._id}`);
     } catch (error) {
       console.error("Create ad error:", error);
-      alert("광고 생성에 실패했습니다");
+      notify("광고 생성에 실패했습니다", "error");
     }
   };
 

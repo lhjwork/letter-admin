@@ -19,6 +19,7 @@ import Ads from "./pages/Ads";
 import AdNew from "./pages/AdNew";
 import AdDetail from "./pages/AdDetail";
 import AdStats from "./pages/AdStats";
+import { NoticeHost } from "./components/common/Notice";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -97,6 +98,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter basename={import.meta.env.BASE_URL}>
         <AppRoutes />
+        <NoticeHost />
       </BrowserRouter>
     </QueryClientProvider>
   );

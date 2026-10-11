@@ -13,6 +13,7 @@ import Loading from "../components/common/Loading";
 import DisplayStatusBadge from "../components/ads/DisplayStatusBadge";
 import PriorityBadge from "../components/ads/PriorityBadge";
 import "./Ads.scss";
+import { notify, askConfirm } from "../components/common/Notice";
 
 const statusLabels: Record<AdStatus, string> = {
   draft: "초안",
@@ -42,11 +43,11 @@ export default function Ads() {
     const draftAds = ads.filter(ad => ad.status === "draft");
     
     if (draftAds.length === 0) {
-      alert("활성화할 초안 광고가 없습니다.");
+      notify("활성화할 초안 광고가 없습니다.");
       return;
     }
 
-    if (!confirm(`${draftAds.length}개의 초안 광고를 모두 활성화하시겠습니까?`)) {
+    if (!(await askConfirm(`${draftAds.length}개의 초안 광고를 모두 활성화하시겠습니까?`))) {
       return;
     }
 
@@ -69,10 +70,10 @@ export default function Ads() {
         )
       );
       
-      alert(`${draftAds.length}개 광고가 모두 활성화되었습니다!`);
+      notify(`${draftAds.length}개 광고가 모두 활성화되었습니다!`);
     } catch (error) {
       console.error("Bulk activate error:", error);
-      alert("일괄 활성화에 실패했습니다.");
+      notify("일괄 활성화에 실패했습니다.", "error");
     }
   };
 
@@ -91,10 +92,10 @@ export default function Ads() {
         } 
       });
       
-      alert("광고가 활성화되었습니다! 이제 노출됩니다.");
+      notify("광고가 활성화되었습니다! 이제 노출됩니다.");
     } catch (error) {
       console.error("Quick activate error:", error);
-      alert("활성화에 실패했습니다.");
+      notify("활성화에 실패했습니다.", "error");
     }
   };
 
@@ -106,10 +107,10 @@ export default function Ads() {
       });
       
       const statusText = statusLabels[newStatus];
-      alert(`광고 상태가 "${statusText}"로 변경되었습니다.`);
+      notify(`광고 상태가 "${statusText}"로 변경되었습니다.`);
     } catch (error) {
       console.error("Status update error:", error);
-      alert("상태 변경에 실패했습니다.");
+      notify("상태 변경에 실패했습니다.", "error");
     }
   };
 

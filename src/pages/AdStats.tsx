@@ -10,6 +10,7 @@ import { useAdStats } from "../hooks/useAds";
 import Button from "../components/common/Button";
 import Loading from "../components/common/Loading";
 import "./AdStats.scss";
+import { notify } from "../components/common/Notice";
 
 const COLORS = ["#8b5cf6", "#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
 
@@ -48,7 +49,7 @@ export default function AdStats() {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(qrUrl);
-    alert("URL이 복사되었습니다!");
+    notify("URL이 복사되었습니다!");
   };
 
   if (isLoading) return <Loading />;
