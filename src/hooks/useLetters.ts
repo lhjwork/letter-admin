@@ -39,6 +39,25 @@ export const useUpdateLetterStatus = () => {
   });
 };
 
+export const useStoryReplies = (id: string, enabled: boolean) => {
+  return useQuery({
+    queryKey: ["admin", "letters", id, "replies"],
+    queryFn: () => lettersApi.getStoryReplies(id),
+    enabled: enabled && !!id,
+  });
+};
+
+export const useToggleAdopt = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => lettersApi.toggleAdopt(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "letters"] });
+    },
+  });
+};
+
 export const useDeleteLetter = () => {
   const queryClient = useQueryClient();
 

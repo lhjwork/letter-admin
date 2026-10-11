@@ -93,6 +93,7 @@ export default function LettersWithPhysical() {
       // 새로운 편지 항목 생성
       acc.push({
         _id: letter._id,
+        replyToId: letter.replyToId,
         title: letter.title,
         authorName: letter.authorName,
         physicalStatus: letter.physicalStatus,
@@ -256,7 +257,10 @@ export default function LettersWithPhysical() {
                     </td>
                   )}
                   <td>
-                    <div className="letters-with-physical__title-cell">{letter.title}</div>
+                    <div className="letters-with-physical__title-cell">
+                      {letter.replyToId && <span className="reply-request-tag">사연 답장</span>}
+                      {letter.title}
+                    </div>
                   </td>
                   <td>{letter.authorName}</td>
                   <td>

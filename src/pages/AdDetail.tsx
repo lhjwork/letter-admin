@@ -37,7 +37,7 @@ export default function AdDetail() {
     { id: "display", label: "노출 제어", icon: "⚙️" },
   ];
 
-  const APP_URL = import.meta.env.VITE_APP_URL || "https://letter.community";
+  const APP_URL = import.meta.env.VITE_APP_URL || "https://letter.seoul.kr";
 
   useEffect(() => {
     if (data?.data) {

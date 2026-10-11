@@ -42,7 +42,7 @@ export default function AdStats() {
   });
 
   const stats = data?.data;
-  const APP_URL = import.meta.env.VITE_APP_URL || "https://letter.community";
+  const APP_URL = import.meta.env.VITE_APP_URL || "https://letter.seoul.kr";
   const qrUrl = stats?.ad?.slug
     ? `${APP_URL}/ad/${stats.ad.slug}?utm_source=qr&utm_medium=offline`
     : "";

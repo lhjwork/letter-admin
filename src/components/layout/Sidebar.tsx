@@ -43,6 +43,18 @@ export default function Sidebar() {
       icon: "📢",
       show: hasPermission(PERMISSIONS.LETTERS_READ),
     },
+    {
+      path: "/announcements",
+      label: "공지",
+      icon: "📌",
+      show: hasPermission(PERMISSIONS.NOTICES_WRITE),
+    },
+    {
+      path: "/inquiries",
+      label: "문의",
+      icon: "💬",
+      show: hasPermission(PERMISSIONS.INQUIRIES_READ),
+    },
   ];
 
   return (

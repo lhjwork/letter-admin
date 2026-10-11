@@ -1,0 +1,80 @@
+.announcements {
+  padding: 0 16px;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  &__title {
+    font-size: 24px;
+    font-weight: 700;
+  }
+}
+
+.ann-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #111827;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    color: #2563eb;
+    text-decoration: underline;
+  }
+}
+
+.ann-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #f3f4f6;
+  color: #4b5563;
+  font-size: 12px;
+  white-space: nowrap;
+
+  &--pin {
+    background: #fde8e3;
+    color: #b44a33;
+  }
+
+  &--on {
+    background: #d1fae5;
+    color: #065f46;
+  }
+}
+
+.ann-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  textarea {
+    white-space: pre-wrap;
+  }
+
+  &__checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    font-size: 14px;
+
+    label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}

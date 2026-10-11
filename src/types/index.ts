@@ -13,14 +13,17 @@ export const PERMISSIONS = {
   ADMINS_WRITE: "admins.write",
   ADMINS_DELETE: "admins.delete",
   DASHBOARD_READ: "dashboard.read",
+  NOTICES_WRITE: "notices.write",
+  INQUIRIES_READ: "inquiries.read",
+  INQUIRIES_WRITE: "inquiries.write",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 
 export const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
   super_admin: Object.values(PERMISSIONS),
-  admin: [PERMISSIONS.USERS_READ, PERMISSIONS.USERS_WRITE, PERMISSIONS.LETTERS_READ, PERMISSIONS.LETTERS_WRITE, PERMISSIONS.LETTERS_DELETE, PERMISSIONS.DASHBOARD_READ],
-  manager: [PERMISSIONS.USERS_READ, PERMISSIONS.LETTERS_READ, PERMISSIONS.DASHBOARD_READ],
+  admin: [PERMISSIONS.USERS_READ, PERMISSIONS.USERS_WRITE, PERMISSIONS.LETTERS_READ, PERMISSIONS.LETTERS_WRITE, PERMISSIONS.LETTERS_DELETE, PERMISSIONS.DASHBOARD_READ, PERMISSIONS.NOTICES_WRITE, PERMISSIONS.INQUIRIES_READ, PERMISSIONS.INQUIRIES_WRITE],
+  manager: [PERMISSIONS.USERS_READ, PERMISSIONS.LETTERS_READ, PERMISSIONS.DASHBOARD_READ, PERMISSIONS.INQUIRIES_READ],
 };
 
 export interface Admin {
@@ -128,6 +131,23 @@ export interface Letter {
   updatedAt: string;
   // 실물 편지 관련 필드 (단순화)
   physicalLetter?: PhysicalLetterSummary;
+  // 사연 답장일 때만
+  replyToId?: string;
+  adoptedAt?: string;
+  isAdminReply?: boolean;
+}
+
+// 관리자 사연 상세의 답장 한 줄
+export interface StoryReply {
+  _id: string;
+  authorName: string;
+  isAnonymous: boolean;
+  isAdminReply: boolean;
+  isAdopted: boolean;
+  adoptedAt: string | null;
+  status: LetterStatus;
+  createdAt: string;
+  preview: string;
 }
 
 // ===== 대시보드 =====
@@ -280,11 +300,13 @@ export interface PhysicalRequestResponse {
   };
   physicalNotes: string;
   requestId: string;
+  replyToId?: string; // 사연 답장 신청
 }
 
 // 편지별로 그룹화된 실물 편지 정보 (프론트엔드에서 사용)
 export interface GroupedPhysicalLetter {
   _id: string; // letterId
+  replyToId?: string;
   title: string;
   authorName: string;
   physicalStatus: PhysicalLetterStatus;
@@ -320,4 +342,40 @@ export interface PhysicalLetterDashboard {
     averageWritingToSent: number;
     averageSentToDelivered: number;
   };
+}
+
+// ===== 공지 (Announcement — 토스트 컴포넌트 Notice 와 구분) =====
+export interface Announcement {
+  _id: string;
+  title: string;
+  content?: string;
+  isPinned: boolean;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+export type AnnouncementInput = { title: string; content: string; isPinned: boolean; isPublished: boolean };
+
+export interface PagedItems<T> {
+  items: T[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}
+
+// ===== 1:1 문의 =====
+export type InquiryStatus = "open" | "answered";
+export interface InquiryItem {
+  _id: string;
+  category: string;
+  title: string;
+  status: InquiryStatus;
+  nickname: string;
+  createdAt: string;
+  answeredAt?: string;
+}
+export interface InquiryDetail extends InquiryItem {
+  content: string;
+  answer?: string;
+  answeredByName?: string;
+  userId?: string;
+  email?: string;
 }

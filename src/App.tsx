@@ -19,6 +19,9 @@ import Ads from "./pages/Ads";
 import AdNew from "./pages/AdNew";
 import AdDetail from "./pages/AdDetail";
 import AdStats from "./pages/AdStats";
+import Announcements from "./pages/Announcements";
+import Inquiries from "./pages/Inquiries";
+import InquiryDetail from "./pages/InquiryDetail";
 import { NoticeHost } from "./components/common/Notice";
 
 const queryClient = new QueryClient({
@@ -88,6 +91,9 @@ function AppRoutes() {
         <Route path="ads/new" element={<AdNew />} />
         <Route path="ads/:id" element={<AdDetail />} />
         <Route path="ads/:id/stats" element={<AdStats />} />
+        <Route path="announcements" element={<Announcements />} />
+        <Route path="inquiries" element={<Inquiries />} />
+        <Route path="inquiries/:id" element={<InquiryDetail />} />
       </Route>
     </Routes>
   );

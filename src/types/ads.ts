@@ -14,7 +14,7 @@ export interface Advertiser {
 // QR URL 생성 유틸리티
 export function generateAdQRUrl(
   adSlug: string,
-  baseUrl: string = "https://letter.community",
+  baseUrl: string = "https://letter.seoul.kr",
   options?: { letterId?: string; campaign?: string }
 ): string {
   const url = new URL(`/ad/${adSlug}`, baseUrl);

@@ -46,6 +46,9 @@ const PERMISSION_LABELS: Record<string, string> = {
   "admins.write": "관리자 수정",
   "admins.delete": "관리자 삭제",
   "dashboard.read": "대시보드 조회",
+  "notices.write": "공지 작성",
+  "inquiries.read": "문의 조회",
+  "inquiries.write": "문의 답변",
 };
 
 export default function AdminForm({ admin, onSubmit, onCancel, loading, isEdit }: AdminFormProps) {

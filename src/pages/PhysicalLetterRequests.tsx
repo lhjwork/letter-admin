@@ -117,7 +117,10 @@ export default function PhysicalLetterRequests() {
                 <tr key={request.requestId}>
                   <td>
                     <div className="physical-letter-requests__letter-info">
-                      <div className="physical-letter-requests__letter-title">{request.title}</div>
+                      <div className="physical-letter-requests__letter-title">
+                        {request.replyToId && <span className="reply-request-tag">사연 답장</span>}
+                        {request.title}
+                      </div>
                       <div className="physical-letter-requests__letter-author">작성자: {request.authorName}</div>
                     </div>
                   </td>
